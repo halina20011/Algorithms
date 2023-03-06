@@ -9,6 +9,10 @@ Pong </br>
 Mandelbrot set </br>
 ![Preview](/Images/mandelbrotSet.png) </br>
 
+Sorting Algorithms </br>
+Bubble Sort </br>
+![Preview](/Images/bubbleSort.png) </br>
+
 ## SDL2:
 `yay -S sdl2` </br>
 `yay -S sdl2_image` </br>
