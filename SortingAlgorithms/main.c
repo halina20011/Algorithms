@@ -15,6 +15,33 @@
 const int frameRate = 60;
 const int frameDelay = 1000 / frameRate;
 
+int ended = 0;
+int finalAnimation = 0;
+int indexAnimation = 0;
+
+int drawFinalAnimation(SDL_Renderer *renderer, int *numbers, int length, int width){
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    for(int i = 0; i < length; i++){
+        int x = i * width;
+        if(i <= indexAnimation){
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            drawRectangle(renderer, x, WINDOW_HEIGHT - numbers[i], width, numbers[i]);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        }
+        else{
+            drawRectangle(renderer, x, WINDOW_HEIGHT - numbers[i], width, numbers[i]);
+        }
+    }
+
+    SDL_RenderPresent(renderer);
+    
+    return 0;
+}
+
 int drawNumbers(SDL_Renderer *renderer, int *numbers, int length, int width, int _j){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
@@ -73,39 +100,53 @@ void swap(int *x, int *y){
 
 Uint32 bubbleSort(Uint32 interval, void *param){
     SDL_Renderer *renderer = *((SDL_Renderer**) param);
-    int *numbers = *((int**) (param + sizeof(SDL_Renderer*)));
-    int width = *((int*) (param + sizeof(SDL_Renderer*) + sizeof(int*)));
-    int *i = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int) + sizeof(int*) * 1));
-    int *j = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int) + sizeof(int*) * 2));
+    int *numbers    = *((int**) (param + sizeof(SDL_Renderer*)));
+    int *i          = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 1));
+    int *j          = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 2));
+    int *sorted     = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 3));
+    int width       = *((int*)  (param + sizeof(SDL_Renderer*) + sizeof(int*) * 4));
 
     int length = WINDOW_WIDTH / width;
 
-    drawNumbers(renderer, numbers, length, width, *(j));
+    // If array isn't yet sorted
+    if(ended == 0){
+        drawNumbers(renderer, numbers, length, width, *(j));
 
-    // TODO: add animation when its done
-    if(*(i) < length){
-        int n1 = numbers[*(j)];
-        int n2 = numbers[*(j) + 1];
-        if(n2 < n1){
-            swap(&numbers[*(j)], &numbers[*(j) + 1]);
+        // If j is in the and i is still smaller than number of numbers 
+        // Firts foor lop
+        if(*(j) == length - *(i) - 1 && *(i) < length - 1){
+            if(*(sorted) == 1){
+                ended = 1;
+            }
+            *(sorted) = 1;
+            *(i) += 1;
+        }
+        
+        // Worst case scenario we need to go n^2
+        // Second foor lop
+        if(*(i) < length){
+            int n1 = numbers[*(j)];
+            int n2 = numbers[*(j) + 1];
+
+            if(n2 < n1){
+                swap(&numbers[*(j)], &numbers[*(j) + 1]);
+                *(sorted) = 0;
+            }
+
+            // While j is smaller than residue of unsorted numbers proceed
+            if(*(j) < length - *(i) - 1){
+                *(j) += 1;
+            }
+            else{
+                *(j) = 0;
+            }
         }
     }
-
-    if(*(i) < length - 1 && *(j) == length - *(i) - 1){
-        *(i) += 1;
-    }
-
-    if(*(i) < length){
-        if(*(j) < length - *(i) - 1){
-            *(j) += 1;
-        }
-        else{
-            *(j) = 0;
+    else{
+        if(indexAnimation++ < length){
+            drawFinalAnimation(renderer, numbers, length, width);
         }
     }
-
-
-    // printf("R: %p\n", renderer);
     
     return interval;
 }
@@ -138,18 +179,21 @@ int main(){
 
     int i = 0;
     int j = 0;
+    int sorted = 1;
     
-    size_t paramSize = sizeof(SDL_Renderer*) + sizeof(int*) + sizeof(int) + sizeof(int*) * 2;
+    size_t paramSize = sizeof(SDL_Renderer*) + sizeof(int*) * 4 + sizeof(int);
     printf("Param size: %zu\n", paramSize);
 
     void *param = malloc(paramSize);
     *((SDL_Renderer**) (param)) = renderer;
     *((int**) (param + sizeof(SDL_Renderer*))) = numbers;
-    *((int*)  (param + sizeof(SDL_Renderer*) + sizeof(int*))) = width;
-    *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int) + sizeof(int*) * 1)) = &i;
-    *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int) + sizeof(int*) * 2)) = &j;
+    *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 1)) = &i;
+    *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 2)) = &j;
+    *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 3)) = &sorted;
+    *((int*)  (param + sizeof(SDL_Renderer*) + sizeof(int*) * 4)) = width;
 
     // Schedule the first frame
+    // TODO: ability to change speed
     SDL_TimerID timer = SDL_AddTimer(frameDelay, bubbleSort, param);
     
     int run = 1;
