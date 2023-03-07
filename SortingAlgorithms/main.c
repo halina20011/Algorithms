@@ -7,13 +7,19 @@
 
 // for time() and clock()
 #include <time.h>
+// For PRIu32 macro
+#include <inttypes.h>
 #include <math.h>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-const int frameRate = 60;
-const int frameDelay = 1000 / frameRate;
+const float frameRateTable[] = {1, 2, 5, 10, 50, 100, 250, 500};
+const short int frameRateMaxIndex = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
+unsigned short frameRateIndex = 5;
+
+#define frameRate  ((float)frameRateTable[frameRateIndex])
+#define frameDelay ((Uint32)1000 / (Uint32)frameRate)
 
 int ended = 0;
 int finalAnimation = 0;
@@ -151,7 +157,7 @@ Uint32 bubbleSort(Uint32 interval, void *param){
     return interval;
 }
 
-int main(){
+int main(int argc, char **argv){
     SDL_Event event;
     SDL_Renderer *renderer;
     SDL_Window *window;
@@ -162,7 +168,7 @@ int main(){
     }
 
     // Create a window and renderer
-    window = SDL_CreateWindow("Template", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Sorting Algorithms", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -192,9 +198,10 @@ int main(){
     *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 3)) = &sorted;
     *((int*)  (param + sizeof(SDL_Renderer*) + sizeof(int*) * 4)) = width;
 
+    void *func = bubbleSort;
+
     // Schedule the first frame
-    // TODO: ability to change speed
-    SDL_TimerID timer = SDL_AddTimer(frameDelay, bubbleSort, param);
+    SDL_TimerID timer = SDL_AddTimer(frameDelay, func, param);
     
     int run = 1;
     while(run){
@@ -203,6 +210,37 @@ int main(){
                 SDL_Keycode key = event.key.keysym.sym;
                 if(key == SDLK_q || key == SDLK_ESCAPE){
                     run = 0;
+                }
+            }
+            else if(event.type == SDL_KEYUP){
+                SDL_Keycode key = event.key.keysym.sym;
+                
+                int update = 0;
+                if(key == SDLK_RETURN){
+                    if(frameRateIndex != 6){
+                        frameRateIndex = 6;
+                        update = 1;
+                    }
+                }
+                else if(key == SDLK_s || key == SDLK_DOWN){
+                    if(0 < frameRateIndex){
+                        frameRateIndex--;
+                        update = 1;
+                    }
+                }
+                else if(key == SDLK_w || key == SDLK_UP){
+                    if(frameRateIndex < frameRateMaxIndex - 1){
+                        frameRateIndex++;
+                        update = 1;
+                    }
+                }
+
+                if(update == 1){
+                    SDL_RemoveTimer(timer);
+                    timer = SDL_AddTimer(frameDelay, func, param);
+
+                    // printf("Frame rate: %.2f\n", frameRate);
+                    // printf("Frame delay: %"PRIu32"\n", frameDelay);
                 }
             }
             else if(event.type == SDL_QUIT){
