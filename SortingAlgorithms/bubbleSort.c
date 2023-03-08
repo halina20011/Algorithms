@@ -1,4 +1,3 @@
-// #ifdef BUBBLESORT
 #include "draw.c"
 
 void *bubbleSortInit(SDL_Renderer *renderer, int *numbers, int width){
@@ -32,6 +31,8 @@ int bubbleSortFree(void *param){
     free(i);
     free(j);
     free(sorted);
+
+    return 0;
 }
 
 void swap(int *x, int *y){
@@ -52,7 +53,7 @@ Uint32 bubbleSort(Uint32 interval, void *param){
 
     // If array isn't yet sorted
     if(ended == 0){
-        drawNumbers(renderer, numbers, length, width, *(j));
+        drawNumbers(renderer, numbers, length, width, *(j), *(j) + 1);
 
         // If j is in the and i is still smaller than number of numbers 
         // Firts foor lop
@@ -92,5 +93,3 @@ Uint32 bubbleSort(Uint32 interval, void *param){
     
     return interval;
 }
-
-// #endif /* ifdef bubbleSort */

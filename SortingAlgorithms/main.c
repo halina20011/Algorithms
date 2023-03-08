@@ -1,4 +1,4 @@
-// gcc main.c $(sdl2-config --cflags --libs) -lm -o Build/main && ./Build/main
+// gcc main.c $(sdl2-config --cflags --libs) -lm -o Build/main && ./Build/main [indexAnimation]
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
@@ -27,6 +27,7 @@ int indexAnimation = 0;
 
 // Include all Sorting Algorithms 
 #include "bubbleSort.c"
+#include "selectionSort.c"
 
 int fill(int *array, int length, float increase){
     printf("Length: %d\n", length);
@@ -55,7 +56,25 @@ int shuffle(int *array, int length){
     return 0;
 }
 
+void *sortingAlgorithms[] = {&bubbleSort, &selectionSort};
+void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit};
+void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree};
+
+size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
+
 int main(int argc, char **argv){
+    unsigned short runAlgorithmIndex = 0;
+    if(argc == 2){
+        sscanf(argv[1], "%d", &runAlgorithmIndex, sizeof(runAlgorithmIndex));
+
+        // runAlgorithmIndex = atoi(argv[1]);
+        if(runAlgorithmIndex < 0 || sortingAlgorithmsLength <= runAlgorithmIndex){
+            runAlgorithmIndex = 0;
+        }
+
+        printf("Algorithm index: %d\n", runAlgorithmIndex);
+    }
+
     SDL_Event event;
     SDL_Renderer *renderer;
     SDL_Window *window;
@@ -77,15 +96,17 @@ int main(int argc, char **argv){
     float increase = (float)WINDOW_HEIGHT / (float)length;
     printf("Lengtht: %d increase: %f\n", length, increase);
     int *numbers = malloc(sizeof(int) * length);
-
+    
     fill(numbers, length, increase);
     shuffle(numbers, length);
-    
-    void *param = bubbleSortInit(renderer, numbers, width);
-    void *func = bubbleSort;
 
+    void *(*initFunction)(SDL_Renderer*, int*, int) = sortingAlgorithmsInit[runAlgorithmIndex];
+    void *(*freeFunction)(void *param) = sortingAlgorithmsFree[runAlgorithmIndex];
+    void *param = (*initFunction)(renderer, numbers, width);
+    void *func = sortingAlgorithms[runAlgorithmIndex];
+    
     // Schedule the first frame
-    SDL_TimerID timer = SDL_AddTimer(frameDelay, bubbleSort, param);
+    SDL_TimerID timer = SDL_AddTimer(frameDelay, func, param);
     
     int run = 1;
     while(run){
@@ -137,13 +158,12 @@ int main(int argc, char **argv){
     SDL_RemoveTimer(timer);
 
     printf("Param\n");
-    bubbleSortFree(param);
+    (*freeFunction)(param);
     free(numbers);
-    free(param);
 
     printf("Other\n");
     // TODO: fix this
-    // This will sometime make "Segmentation fault (core dumped)" but only if there is drawNumbers in bubbleSort
+    // This will sometimes make "Segmentation fault (core dumped)", probably the timer is set to be executed but the memory is cleared before
     SDL_DestroyRenderer(renderer);
 
     SDL_DestroyWindow(window);
