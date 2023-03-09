@@ -11,6 +11,8 @@ Mandelbrot set </br>
 
 Sorting Algorithms </br>
 Bubble Sort </br>
+Selection Sort </br>
+Bogossort </br>
 ![Preview](/Images/bubbleSort.png) </br>
 
 ## SDL2:
