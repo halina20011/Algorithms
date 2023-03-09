@@ -98,6 +98,7 @@ Uint32 selectionSort(Uint32 interval, void *param){
             }
             
             *(i) += 1;
+            *(minIndex) = *(i);
             *(j) = *(i) + 1;
         }
     }
