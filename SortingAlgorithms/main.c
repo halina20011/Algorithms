@@ -29,6 +29,7 @@ int indexAnimation = 0;
 #include "bubbleSort.c"
 #include "selectionSort.c"
 #include "bogosort.c"
+#include "insertionSort.c"
 
 int fill(int *array, int length, float increase){
     printf("Length: %d\n", length);
@@ -57,9 +58,17 @@ int shuffle(int *array, int length){
     return 0;
 }
 
-void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort};
-void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit};
-void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree};
+void printArray(int *array, int length){
+    for(int i = 0; i < length; i++){
+        printf("%d ", array[i]);
+    }
+
+    printf("\n");
+}
+
+void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort};
+void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit};
+void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree};
 
 size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
 

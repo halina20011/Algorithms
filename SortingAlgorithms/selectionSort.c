@@ -35,14 +35,6 @@ int *selectionSortFree(void *param){
     return 0;
 }
 
-void printArray(int *array, int length){
-    for(int i = 0; i < length; i++){
-        printf("%d ", array[i]);
-    }
-
-    printf("\n");
-}
-
 // Example
 // int *numbersCopy = malloc(sizeof(int) * length);
 // memcpy(numbersCopy, numbers, sizeof(int) * length);

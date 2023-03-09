@@ -13,6 +13,7 @@ Sorting Algorithms </br>
 Bubble Sort </br>
 Selection Sort </br>
 Bogossort </br>
+Insertion Sort </br>
 ![Preview](/Images/bubbleSort.png) </br>
 
 ## SDL2:
