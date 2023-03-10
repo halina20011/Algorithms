@@ -5,8 +5,10 @@
 
 #include "../pixel.c"
 
-// for time() and clock()
+// For time() and clock()
 #include <time.h>
+// For usleep()
+#include <unistd.h>
 // For PRIu32 macro
 #include <inttypes.h>
 #include <math.h>
@@ -90,7 +92,7 @@ int main(int argc, char **argv){
     SDL_Window *window;
     
     // Initialize SDL2
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
         printf("Error initializing SDL: %s\n", SDL_GetError());
     }
 
@@ -166,17 +168,17 @@ int main(int argc, char **argv){
 
     printf("Timer\n");
     SDL_RemoveTimer(timer);
+    // Wait for timer to execute last time
+    usleep(frameDelay * 1000 * 2);
 
-    printf("Param\n");
-    (*freeFunction)(param);
-    free(numbers);
-
-    printf("Other\n");
-    // TODO: fix this
-    // This will sometimes make "Segmentation fault (core dumped)", probably the timer is set to be executed but the memory is cleared before
+    printf("Renderer and window\n");
     SDL_DestroyRenderer(renderer);
-
     SDL_DestroyWindow(window);
+    
+    printf("Free\n");
+    free(numbers);
+    (*freeFunction)(param);
+
     SDL_Quit();
 
     return 0;
