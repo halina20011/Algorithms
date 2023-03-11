@@ -14,6 +14,7 @@ Bubble Sort </br>
 Selection Sort </br>
 Bogossort </br>
 Insertion Sort </br>
+Gnome Sort </br>
 ![Preview](/Images/bubbleSort.png) </br>
 
 ## SDL2:

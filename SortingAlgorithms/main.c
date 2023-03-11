@@ -32,6 +32,7 @@ int indexAnimation = 0;
 #include "selectionSort.c"
 #include "bogosort.c"
 #include "insertionSort.c"
+#include "gnomeSort.c"
 
 int fill(int *array, int length, float increase){
     printf("Length: %d\n", length);
@@ -68,9 +69,9 @@ void printArray(int *array, int length){
     printf("\n");
 }
 
-void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort};
-void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit};
-void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree};
+void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort, &gnomeSort};
+void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit, &gnomeSortInit};
+void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree, &gnomeSortFree};
 
 size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
 
