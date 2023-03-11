@@ -1,4 +1,4 @@
-#include "draw.c"
+#include "../draw.c"
 
 void printArray(int *, int);
 

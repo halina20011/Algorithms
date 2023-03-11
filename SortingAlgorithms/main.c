@@ -28,11 +28,11 @@ int finalAnimation = 0;
 int indexAnimation = 0;
 
 // Include all Sorting Algorithms 
-#include "bubbleSort.c"
-#include "selectionSort.c"
-#include "bogosort.c"
-#include "insertionSort.c"
-#include "gnomeSort.c"
+#include "Algorithms/bubbleSort.c"
+#include "Algorithms/selectionSort.c"
+#include "Algorithms/bogosort.c"
+#include "Algorithms/insertionSort.c"
+#include "Algorithms/gnomeSort.c"
 
 int fill(int *array, int length, float increase){
     printf("Length: %d\n", length);
@@ -70,23 +70,44 @@ void printArray(int *array, int length){
 }
 
 void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort, &gnomeSort};
+char *sortingAlgorithmsNames[] = {"Bubble Sort", "Selection Sort", "Bogosort", "Insertion Sort", "Gnome Sort"};
 void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit, &gnomeSortInit};
 void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree, &gnomeSortFree};
 
 size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
 
-int main(int argc, char **argv){
-    unsigned short runAlgorithmIndex = 0;
-    if(argc == 2){
-        sscanf(argv[1], "%d", &runAlgorithmIndex, sizeof(runAlgorithmIndex));
+void showOptions(){
+    printf("Please select correct algorithm to run\n");
+    printf("Index\t\tAlgorithm Name\n");
 
+    for(int i = 0; i < sortingAlgorithmsLength; i++){
+        printf("%5d\t\t%s\n", i, sortingAlgorithmsNames[i]);
+    }
+}
+
+int main(int argc, char **argv){
+    short runAlgorithmIndex = -1;
+    if(argc == 2){
         // runAlgorithmIndex = atoi(argv[1]);
-        if(runAlgorithmIndex < 0 || sortingAlgorithmsLength <= runAlgorithmIndex){
+        int s = sscanf(argv[1], "%d", &runAlgorithmIndex, sizeof(runAlgorithmIndex));
+
+        // Input is not a number
+        if(s == 0){
+            runAlgorithmIndex = -1;
+        }
+        else if(runAlgorithmIndex < 0 || sortingAlgorithmsLength <= runAlgorithmIndex){
+            printf("Valid range is <0; %i)\n", sortingAlgorithmsLength);
             runAlgorithmIndex = 0;
         }
 
-        printf("Algorithm index: %d\n", runAlgorithmIndex);
     }
+
+    if(runAlgorithmIndex < 0){
+        showOptions();
+        return 1;
+    }
+
+    printf("Algorithm: \"%s\"\n", sortingAlgorithmsNames[runAlgorithmIndex]);
 
     SDL_Event event;
     SDL_Renderer *renderer;

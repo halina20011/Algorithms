@@ -1,4 +1,4 @@
-#include "draw.c"
+#include "../draw.c"
 
 void *gnomeSortInit(SDL_Renderer *renderer, int *numbers, int width){
     int *i = malloc(sizeof(int));

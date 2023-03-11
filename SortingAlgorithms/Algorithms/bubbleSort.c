@@ -1,4 +1,4 @@
-#include "draw.c"
+#include "../draw.c"
 
 void *bubbleSortInit(SDL_Renderer *renderer, int *numbers, int width){
     int *i = malloc(sizeof(int));

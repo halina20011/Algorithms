@@ -1,4 +1,4 @@
-#include "draw.c"
+#include "../draw.c"
 
 extern int shuffle(int*, int);
 
