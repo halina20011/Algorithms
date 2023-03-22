@@ -16,6 +16,7 @@ Bogossort </br>
 Insertion Sort </br>
 Gnome Sort </br>
 Odd-even Sort </br>
+Stooge Sort </br>
 ![Preview](/Images/bubbleSort.png) </br>
 
 ## SDL2:

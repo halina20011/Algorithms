@@ -34,6 +34,7 @@ int indexAnimation = 0;
 #include "Algorithms/insertionSort.c"
 #include "Algorithms/gnomeSort.c"
 #include "Algorithms/oddevenSort.c"
+#include "Algorithms/stoogeSort.c"
 
 int fill(int *array, int length, float increase){
     printf("Length: %d\n", length);
@@ -70,16 +71,17 @@ void printArray(int *array, int length){
     printf("\n");
 }
 
-void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort, &gnomeSort, &oddevenSort};
-char *sortingAlgorithmsNames[] = {"Bubble Sort", "Selection Sort", "Bogosort", "Insertion Sort", "Gnome Sort", "Odd-even Sort"};
-void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit, &gnomeSortInit, &oddevenSortInit};
-void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree, &gnomeSortFree, &oddevenSortFree};
+void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort, &gnomeSort, &oddevenSort, &stoogeSort};
+char *sortingAlgorithmsNames[] = {"Bubble Sort", "Selection Sort", "Bogosort", "Insertion Sort", "Gnome Sort", "Odd-even Sort", "Stooge Sort"};
+void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit, &gnomeSortInit, &oddevenSortInit, &stoogeSortInit};
+void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree, &gnomeSortFree, &oddevenSortFree, &stoogeSortFree};
 
 size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
 
 void showOptions(){
     printf("Please select correct algorithm to run\n");
     printf("Index\t\tAlgorithm Name\n");
+    printf("   -1\t\t[Run the last algorithm]\n");
 
     for(int i = 0; i < sortingAlgorithmsLength; i++){
         printf("%5d\t\t%s\n", i, sortingAlgorithmsNames[i]);
@@ -96,11 +98,13 @@ int main(int argc, char **argv){
         if(s == 0){
             runAlgorithmIndex = -1;
         }
-        else if(runAlgorithmIndex < 0 || sortingAlgorithmsLength <= runAlgorithmIndex){
+        else if(runAlgorithmIndex == -1){
+            runAlgorithmIndex = sortingAlgorithmsLength - 1;
+        }
+        else if(runAlgorithmIndex < -1 || sortingAlgorithmsLength <= runAlgorithmIndex){
             printf("Valid range is <0; %i)\n", sortingAlgorithmsLength);
             runAlgorithmIndex = 0;
         }
-
     }
 
     if(runAlgorithmIndex < 0){
