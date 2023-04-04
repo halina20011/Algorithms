@@ -1,4 +1,3 @@
-Radix Sort
 Binary Radix Sort
 Bucket Sort
 Slow Sort

@@ -36,6 +36,7 @@
 #include "Algorithms/gnomeSort.c"
 #include "Algorithms/oddevenSort.c"
 #include "Algorithms/stoogeSort.c"
+#include "Algorithms/radixSort.c"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -57,16 +58,14 @@ unsigned short frameRateIndex = 5;
 int ended = 0;
 int indexAnimation = 0;
 
-void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort, &gnomeSort, &oddevenSort, &stoogeSort};
-char *sortingAlgorithmsNames[] = {"Bubble Sort", "Selection Sort", "Bogosort", "Insertion Sort", "Gnome Sort", "Odd-even Sort", "Stooge Sort"};
-void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit, &gnomeSortInit, &oddevenSortInit, &stoogeSortInit};
-void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree, &gnomeSortFree, &oddevenSortFree, &stoogeSortFree};
+void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort, &gnomeSort, &oddevenSort, &stoogeSort, &radixSort};
+char *sortingAlgorithmsNames[] = {"Bubble Sort", "Selection Sort", "Bogosort", "Insertion Sort", "Gnome Sort", "Odd-even Sort", "Stooge Sort", "Radix Sort"};
+void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit, &gnomeSortInit, &oddevenSortInit, &stoogeSortInit, &radixSortInit};
+void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree, &gnomeSortFree, &oddevenSortFree, &stoogeSortFree, &radixSortFree};
 
 size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
 
 int fill(int *array, int length, float increase){
-    printf("Length: %d\n", length);
-    
     for(int i = 0; i < length; i++){
         *(array + i) = (i + 1) * increase;
     }
