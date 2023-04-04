@@ -1,5 +1,20 @@
 // gcc main.c $(sdl2-config --cflags --libs) -lm -o Build/main && ./Build/main [indexAnimation]
 
+// Copyright (C) 2023  halina20011
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
 
@@ -13,20 +28,6 @@
 #include <inttypes.h>
 #include <math.h>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
-
-const float frameRateTable[] = {1, 2, 5, 10, 50, 100, 250, 500};
-const short int frameRateMaxIndex = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
-unsigned short frameRateIndex = 5;
-
-#define frameRate  ((float)frameRateTable[frameRateIndex])
-#define frameDelay ((Uint32)1000 / (Uint32)frameRate)
-
-int ended = 0;
-int finalAnimation = 0;
-int indexAnimation = 0;
-
 // Include all Sorting Algorithms 
 #include "Algorithms/bubbleSort.c"
 #include "Algorithms/selectionSort.c"
@@ -35,6 +36,33 @@ int indexAnimation = 0;
 #include "Algorithms/gnomeSort.c"
 #include "Algorithms/oddevenSort.c"
 #include "Algorithms/stoogeSort.c"
+
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+
+const int WINDOWWIDTH = WINDOW_WIDTH;
+const int WINDOWHEIGHT = WINDOW_HEIGHT;
+
+SDL_Window *window;
+SDL_Renderer *renderer;
+SDL_Event event;
+
+const float frameRateTable[8] = {1, 2, 5, 10, 50, 100, 250, 500};
+const short int frameRateMaxIndex = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
+unsigned short frameRateIndex = 5;
+
+#define frameRate  ((float)frameRateTable[frameRateIndex])
+#define frameDelay ((Uint32)1000 / (Uint32)frameRate)
+
+int ended = 0;
+int indexAnimation = 0;
+
+void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort, &gnomeSort, &oddevenSort, &stoogeSort};
+char *sortingAlgorithmsNames[] = {"Bubble Sort", "Selection Sort", "Bogosort", "Insertion Sort", "Gnome Sort", "Odd-even Sort", "Stooge Sort"};
+void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit, &gnomeSortInit, &oddevenSortInit, &stoogeSortInit};
+void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree, &gnomeSortFree, &oddevenSortFree, &stoogeSortFree};
+
+size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
 
 int fill(int *array, int length, float increase){
     printf("Length: %d\n", length);
@@ -71,13 +99,6 @@ void printArray(int *array, int length){
     printf("\n");
 }
 
-void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort, &gnomeSort, &oddevenSort, &stoogeSort};
-char *sortingAlgorithmsNames[] = {"Bubble Sort", "Selection Sort", "Bogosort", "Insertion Sort", "Gnome Sort", "Odd-even Sort", "Stooge Sort"};
-void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit, &gnomeSortInit, &oddevenSortInit, &stoogeSortInit};
-void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree, &gnomeSortFree, &oddevenSortFree, &stoogeSortFree};
-
-size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
-
 void showOptions(){
     printf("Please select correct algorithm to run\n");
     printf("Index\t\tAlgorithm Name\n");
@@ -113,10 +134,6 @@ int main(int argc, char **argv){
     }
 
     printf("Algorithm: \"%s\"\n", sortingAlgorithmsNames[runAlgorithmIndex]);
-
-    SDL_Event event;
-    SDL_Renderer *renderer;
-    SDL_Window *window;
     
     // Initialize SDL2
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
@@ -130,6 +147,13 @@ int main(int argc, char **argv){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     
+    uint8_t *buffer = NULL;
+    int r = newPixelBuffer(&buffer);
+    if(r){
+        printf("Error allocating memory for pixel buffer\n");
+        return 1;
+    }
+
     const unsigned int width = 10;
     int length = WINDOW_WIDTH / width;
     float increase = (float)WINDOW_HEIGHT / (float)length;
@@ -139,9 +163,9 @@ int main(int argc, char **argv){
     fill(numbers, length, increase);
     shuffle(numbers, length);
 
-    void *(*initFunction)(SDL_Renderer*, int*, int) = sortingAlgorithmsInit[runAlgorithmIndex];
+    void *(*initFunction)(uint8_t**, int*, int) = sortingAlgorithmsInit[runAlgorithmIndex];
     void *(*freeFunction)(void *param) = sortingAlgorithmsFree[runAlgorithmIndex];
-    void *param = (*initFunction)(renderer, numbers, width);
+    void *param = (*initFunction)(&buffer, numbers, width);
     void *func = sortingAlgorithms[runAlgorithmIndex];
     
     // Schedule the first frame

@@ -1,24 +1,27 @@
 #include "../draw.c"
 
-void *gnomeSortInit(SDL_Renderer *renderer, int *numbers, int width){
+extern int ended;
+extern int indexAnimation;
+
+void *gnomeSortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
     
     *(i) = 0;
 
-    size_t paramSize = sizeof(SDL_Renderer*) + sizeof(int*) * 2 + sizeof(int);
+    size_t paramSize = sizeof(uint8_t*) + sizeof(int*) * 2 + sizeof(int);
     printf("Param size: %zu\n", paramSize);
 
     void *param = malloc(paramSize);
-    *((SDL_Renderer**) (param)) = renderer;
-    *((int**) (param + sizeof(SDL_Renderer*))) = numbers;
-    *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 1)) = i;
-    *((int*)  (param + sizeof(SDL_Renderer*) + sizeof(int*) * 2)) = width;
+    *((uint8_t***) (param)) = buffer;
+    *((int**) (param + sizeof(uint8_t*))) = numbers;
+    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1)) = i;
+    *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 2)) = width;
 
     return param;
 }
 
 int gnomeSortFree(void *param){
-    int *i  = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 1));
+    int *i  = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
     
     free(i);
 
@@ -53,16 +56,16 @@ int gnomeSortAlg(int *numbers, int length){
 }
 
 Uint32 gnomeSort(Uint32 interval, void *param){
-    SDL_Renderer *renderer = *((SDL_Renderer**) param);
-    int *numbers    = *((int**) (param + sizeof(SDL_Renderer*)));
-    int *i          = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 1));
-    int width       = *((int*)  (param + sizeof(SDL_Renderer*) + sizeof(int*) * 2));
+    uint8_t **buffer = *((uint8_t***) param);
+    int *numbers    = *((int**) (param + sizeof(uint8_t*)));
+    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
+    int width       = *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 2));
 
-    int length = WINDOW_WIDTH / width;
+    int length = WINDOWWIDTH / width;
 
     // If array isn't yet sorted
     if(*(i) < length){
-        drawNumbers(renderer, numbers, length, width, *(i), *(i) + 1);
+        drawNumbers(buffer, numbers, length, width, *(i), *(i) + 1);
         
         if(*(i) == -1){
             *(i) += 1;
@@ -78,7 +81,7 @@ Uint32 gnomeSort(Uint32 interval, void *param){
     }
     else{
         if(indexAnimation++ < length){
-            drawFinalAnimation(renderer, numbers, length, width);
+            drawFinalAnimation(buffer, numbers, length, width);
         }
     }
     

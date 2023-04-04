@@ -1,5 +1,20 @@
 // gcc main.c $(sdl2-config --cflags --libs) -lm -o Build/main && ./Build/main
 
+// Copyright (C) 2023  halina20011
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
 
@@ -12,36 +27,38 @@
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 
-int generate(int *buffer){
+const int WINDOWWIDTH = WINDOW_WIDTH;
+const int WINDOWHEIGHT = WINDOW_HEIGHT;
+
+SDL_Event event;
+SDL_Renderer *renderer;
+SDL_Window *window;
+
+int generate(uint8_t **buffer){
     unsigned seed = time(NULL); // time(0);
     srand(seed);
 
     for(int y = 0; y < WINDOW_HEIGHT; y++){
         for(int x = 0; x < WINDOW_HEIGHT; x++){
-            int index = 4 * (y * WINDOW_WIDTH + x);
-            *(buffer + index + 0) = rand() % 255 + 1;
-            *(buffer + index + 1) = rand() % 255 + 1;
-            *(buffer + index + 2) = rand() % 255 + 1;
-            *(buffer + index + 3) = 255;
+            int i = 4 * (y * WINDOW_WIDTH + x);
+            *(*buffer + i + 0) = rand() % 255 + 1;
+            *(*buffer + i + 1) = rand() % 255 + 1;
+            *(*buffer + i + 2) = rand() % 255 + 1;
+            *(*buffer + i + 3) = 0;
         }
     }
 
     return 0;
 }
 
-int mainLoop(SDL_Renderer *renderer, int *buffer){
+int mainLoop(uint8_t **buffer){
     clock_t start = clock(), diff;
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-    SDL_RenderClear(renderer);
-
-    printf("Generating...\n");
+    // printf("Generating...\n");
     generate(buffer);
 
-    printf("Drawing...\n");
-    drawFromBuffer(renderer, buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
-    printf("Drawn...\n");
-
-    SDL_RenderPresent(renderer);
+    // printf("Drawing...\n");
+    update(*buffer);
+    // printf("Drawn...\n");
 
     diff = clock() - start;
     int msec = diff * 1000 / CLOCKS_PER_SEC;
@@ -53,10 +70,6 @@ int mainLoop(SDL_Renderer *renderer, int *buffer){
 }
 
 int main(){
-    SDL_Event event;
-    SDL_Renderer *renderer;
-    SDL_Window *window;
-    
     // Initialize SDL2
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
         printf("Error initializing SDL: %s\n", SDL_GetError());
@@ -68,9 +81,15 @@ int main(){
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
-    
-    int *buffer = malloc(sizeof(int) * WINDOW_WIDTH * WINDOW_HEIGHT * 4);
-    mainLoop(renderer, buffer);
+
+    uint8_t *buffer = NULL;
+    int r = newPixelBuffer(&buffer);
+    if(r){
+        printf("Error allocating memory for pixel buffer\n");
+        return 1;
+    }
+
+    mainLoop(&buffer);
 
     int run = 1;
     while(run){
@@ -81,7 +100,7 @@ int main(){
                     run = 0;
                 }
                 if(key == SDLK_RETURN){
-                    mainLoop(renderer, buffer);
+                    mainLoop(&buffer);
                 }
             }
             else if(event.type == SDL_QUIT){

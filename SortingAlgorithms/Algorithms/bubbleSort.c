@@ -1,6 +1,9 @@
 #include "../draw.c"
 
-void *bubbleSortInit(SDL_Renderer *renderer, int *numbers, int width){
+extern int ended;
+extern int indexAnimation;
+
+void *bubbleSortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));
     int *sorted = malloc(sizeof(int));
@@ -9,24 +12,24 @@ void *bubbleSortInit(SDL_Renderer *renderer, int *numbers, int width){
     *(j) = 0;
     *(sorted) = 0;
 
-    size_t paramSize = sizeof(SDL_Renderer*) + sizeof(int*) * 4 + sizeof(int);
+    size_t paramSize = sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(int);
     printf("Param size: %zu\n", paramSize);
 
     void *param = malloc(paramSize);
-    *((SDL_Renderer**) (param)) = renderer;
-    *((int**) (param + sizeof(SDL_Renderer*))) = numbers;
-    *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 1)) = i;
-    *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 2)) = j;
-    *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 3)) = sorted;
-    *((int*)  (param + sizeof(SDL_Renderer*) + sizeof(int*) * 4)) = width;
+    *((uint8_t***) (param)) = buffer;
+    *((int**) (param + sizeof(uint8_t*))) = numbers;
+    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1)) = i;
+    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2)) = j;
+    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3)) = sorted;
+    *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 4)) = width;
 
     return param;
 }
 
 int bubbleSortFree(void *param){
-    int *i          = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 1));
-    int *j          = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 2));
-    int *sorted     = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 3));
+    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
+    int *j          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
+    int *sorted     = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
     
     free(i);
     free(j);
@@ -42,18 +45,20 @@ void swap(int *x, int *y){
 }
 
 Uint32 bubbleSort(Uint32 interval, void *param){
-    SDL_Renderer *renderer = *((SDL_Renderer**) param);
-    int *numbers    = *((int**) (param + sizeof(SDL_Renderer*)));
-    int *i          = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 1));
-    int *j          = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 2));
-    int *sorted     = *((int**) (param + sizeof(SDL_Renderer*) + sizeof(int*) * 3));
-    int width       = *((int*)  (param + sizeof(SDL_Renderer*) + sizeof(int*) * 4));
+    uint8_t **buffer = *((uint8_t***) param);
+    int *numbers    = *((int**) (param + sizeof(uint8_t*)));
+    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
+    int *j          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
+    int *sorted     = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
+    int width       = *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 4));
 
-    int length = WINDOW_WIDTH / width;
+    int length = WINDOWWIDTH / width;
 
     // If array isn't yet sorted
     if(ended == 0){
-        drawNumbers(renderer, numbers, length, width, *(j), *(j) + 1);
+        drawNumbers(buffer, numbers, length, width, *(j), *(j) + 1);
+        // int *i = NULL;
+        // printf("%i", *i);
 
         // If j is in the and i is still smaller than number of numbers 
         // Firts foor lop
@@ -87,7 +92,7 @@ Uint32 bubbleSort(Uint32 interval, void *param){
     }
     else{
         if(indexAnimation++ < length){
-            drawFinalAnimation(renderer, numbers, length, width);
+            drawFinalAnimation(buffer, numbers, length, width);
         }
     }
     

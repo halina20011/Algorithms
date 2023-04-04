@@ -1,0 +1,8 @@
+Radix Sort
+Binary Radix Sort
+Bucket Sort
+Slow Sort
+Counting sort
+Cocktail sort
+Bitonic sorter
+Batcher odd–even mergesort
