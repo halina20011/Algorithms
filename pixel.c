@@ -8,7 +8,7 @@ extern SDL_Renderer *renderer;
 
 int rgba[4] = {0};
 
-int setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
+void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
     rgba[0] = r;
     rgba[1] = g;
     rgba[2] = b;
@@ -40,9 +40,22 @@ void clear(uint8_t **buffer){
     }
 }
 
-void drawPixel(uint8_t **buffer, int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
+void fill(uint8_t **buffer){
+    for(int y = 0; y < WINDOWHEIGHT; y++){
+        for(int x = 0; x < WINDOWWIDTH; x++){
+            int i = 4 * (y * WINDOWWIDTH + x);
+
+            *(*buffer + i + 0) = rgba[0];
+            *(*buffer + i + 1) = rgba[1];
+            *(*buffer + i + 2) = rgba[2];
+            *(*buffer + i + 3) = rgba[3];
+        }
+    }
+}
+
+int drawPixel(uint8_t **buffer, int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
     if(WINDOWWIDTH <= x || WINDOWHEIGHT <= y){
-        return;
+        return 1;
     }
 
     int i = 4 * (y * WINDOWWIDTH + x);
@@ -51,6 +64,8 @@ void drawPixel(uint8_t **buffer, int x, int y, uint8_t r, uint8_t g, uint8_t b, 
     *(*buffer + i + 1) = g;
     *(*buffer + i + 2) = b;
     *(*buffer + i + 3) = a;
+
+    return 0;
 }
 
 void drawLine(uint8_t **buffer, int x0, int y0, int x1, int y1){

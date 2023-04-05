@@ -1,4 +1,4 @@
-// gcc main.c $(sdl2-config --cflags --libs) -lm -o Build/main && ./Build/main
+// gcc main.c $(sdl2-config --cflags --libs) -lm -lpng -o Build/main && ./Build/main
 
 // Copyright (C) 2023  halina20011
 //
@@ -19,6 +19,7 @@
 #include <SDL2/SDL_render.h>
 
 #include "../pixel.c"
+#include "../pngWrapper.c"
 
 // for time() and clock()
 #include <time.h>
@@ -44,7 +45,7 @@ int generate(uint8_t **buffer){
             *(*buffer + i + 0) = rand() % 255 + 1;
             *(*buffer + i + 1) = rand() % 255 + 1;
             *(*buffer + i + 2) = rand() % 255 + 1;
-            *(*buffer + i + 3) = 0;
+            *(*buffer + i + 3) = 255;
         }
     }
 
@@ -79,9 +80,6 @@ int main(){
     window = SDL_CreateWindow("Template", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-    SDL_RenderClear(renderer);
-
     uint8_t *buffer = NULL;
     int r = newPixelBuffer(&buffer);
     if(r){
@@ -99,8 +97,12 @@ int main(){
                 if(key == SDLK_q || key == SDLK_ESCAPE){
                     run = 0;
                 }
-                if(key == SDLK_RETURN){
+                else if(key == SDLK_RETURN){
                     mainLoop(&buffer);
+                }
+                else if(key == SDLK_s){
+                    savePng("template.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
+                    printf("Image saved\n");
                 }
             }
             else if(event.type == SDL_QUIT){

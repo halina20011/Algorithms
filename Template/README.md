@@ -5,4 +5,4 @@
 `mkdir Build` </br>
 
 ## Build and run
-`gcc main.c $(sdl2-config --cflags --libs) -lm -o Build/main && ./Build/main` </br>
+`gcc main.c $(sdl2-config --cflags --libs) -lm -lpng -o Build/main && ./Build/main` </br>

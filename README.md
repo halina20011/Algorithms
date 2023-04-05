@@ -1,11 +1,9 @@
-# SDL2
-Repo of different algorithms / games implemented in C with SDL2 library </br>
+# Math Art
+Repo in which you can find the art of mathematics </br>
 
 ## List
 Marching squares </br>
 ![Preview](/Images/marchingSquares.png) </br>
-Pong </br>
-![Preview](/Images/pong.png) </br>
 Mandelbrot set </br>
 ![Preview](/Images/mandelbrotSet.png) </br>
 
@@ -17,9 +15,10 @@ Insertion Sort </br>
 Gnome Sort </br>
 Odd-even Sort </br>
 Stooge Sort </br>
+Radix Sort </br>
 ![Preview](/Images/bubbleSort.png) </br>
 
-## SDL2:
+## SDL2
 `yay -S sdl2` </br>
 `yay -S sdl2_image` </br>
 
@@ -28,4 +27,4 @@ Stooge Sort </br>
 `mkdir Build` </br>
 
 ## Build and run
-`gcc main.c $(sdl2-config --cflags --libs) -lm -o Build/main && ./Build/main` </br>
+`gcc main.c $(sdl2-config --cflags --libs) -lm -lpng -o Build/main && ./Build/main` </br>

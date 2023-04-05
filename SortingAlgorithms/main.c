@@ -1,4 +1,4 @@
-// gcc main.c $(sdl2-config --cflags --libs) -lm -o Build/main && ./Build/main [indexAnimation]
+// gcc main.c $(sdl2-config --cflags --libs) -lm -lpng -o Build/main && ./Build/main [indexAnimation]
 
 // Copyright (C) 2023  halina20011
 //
@@ -19,6 +19,7 @@
 #include <SDL2/SDL_render.h>
 
 #include "../pixel.c"
+#include "../pngWrapper.c"
 
 // For time() and clock()
 #include <time.h>

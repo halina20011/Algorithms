@@ -1,18 +1,48 @@
-// gcc main.c $(sdl2-config --cflags --libs) -lm -o Build/main && ./Build/main
+// gcc main.c $(sdl2-config --cflags --libs) -lm -lpng -o Build/main && ./Build/main
+
+// Copyright (C) 2023  halina20011
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
 
 #include <math.h>
 
+#include "../pixel.c"
+#include "../pngWrapper.c"
+
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 
-int *HSVtoRGB(float H, float S, float V){
-    int *returnArray = malloc(sizeof(int) * 3);
+const int WINDOWWIDTH = WINDOW_WIDTH;
+const int WINDOWHEIGHT = WINDOW_HEIGHT;
 
+SDL_Event event;
+SDL_Renderer *renderer;
+SDL_Window *window;
+
+float cenX = 0.0;
+float cenY = 0.0;
+float scale = 1.0;
+
+int hsv2rgb(float H, float S, float V, int *r, int *g, int *b){
     if(H > 360 || H < 0 || S > 100 || S < 0 || V > 100 || V < 0){
-        return returnArray;
+        *r = 0;
+        *g = 0;
+        *b = 0;
+        return 1;
     }
 
     float s = S / 100;
@@ -20,150 +50,120 @@ int *HSVtoRGB(float H, float S, float V){
     float C = s * v;
     float X = C * (1 - abs(fmod(H / 60.0, 2) - 1));
     float m = v - C;
-    float r, g, b;
+    float _r, _g, _b;
 
     if(H >= 0 && H < 60){
-        r = C;
-        g = X;
-        b = 0;
+        _r = C;
+        _g = X;
+        _b = 0;
     }
     else if(H >= 60 && H < 120){
-        r = X;
-        g = C;
-        b = 0;
+        _r = X;
+        _g = C;
+        _b = 0;
     }
     else if(H >= 120 && H < 180){
-        r = 0;
-        g = C;
-        b = X;
+        _r = 0;
+        _g = C;
+        _b = X;
     }
     else if(H >= 180 && H < 240){
-        r = 0;
-        g = X;
-        b = C;
+        _r = 0;
+        _g = X;
+        _b = C;
     }
     else if(H >= 240 && H < 300){
-        r = X;
-        g = 0;
-        b = C;
+        _r = X;
+        _g = 0;
+        _b = C;
     }
     else{
-        r = C;
-        g = 0;
-        b = X;
+        _r = C;
+        _g = 0;
+        _b = X;
     }
 
-    returnArray[0] = (int)(r + m) * 255;
-    returnArray[1] = (int)(g + m) * 255;
-    returnArray[2] = (int)(b + m) * 255;
+    *r = (int)(_r + m) * 255;
+    *g = (int)(_g + m) * 255;
+    *b = (int)(_b + m) * 255;
 
-    return returnArray;
-}
-
-float cenX = 0.0;
-float cenY = 0.0;
-float scale = 1.0;
-
-void draw(SDL_Renderer *renderer, int *buffer, int width, int height){
-    for(int x = 0; x < width; x++){
-        for(int y = 0; y < height; y++){
-            int index = 4 * (width * x + y);
-            SDL_SetRenderDrawColor(renderer, buffer[index + 0], buffer[index + 1], buffer[index + 2], buffer[index + 3]);
-            SDL_RenderDrawPoint(renderer, x, y);
-        }
-    }
+    return 0;
 }
 
 long double distance(long double x1, long double y1, long double x2, long double y2){
     long double x = x2 - x1;
     long double y = y2 - y1;
 
-    long double s = sqrt(x * x + y * y);
-    
-    return s;
+    return hypot(x, y);
 }
 
-int pixelToPoint(long double *points, int x, int y, int width, int height){
-    long double px = (x - width / 2.0) * (4.0 / width) * (1.0 / scale) + cenX;
-    long double py = (y - height / 2.0) * (4.0 / height) * (1.0 / scale) + cenY;
-    
-    points[0] = px;
-    points[1] = py;
-
-    return 0;
+void pixelToPoint(int x, int y, long double *px, long double *py, int width, int height){
+    *px = (x - width / 2.0) * (4.0 / width) * (1.0 / scale) + cenX;
+    *py = (y - height / 2.0) * (4.0 / height) * (1.0 / scale) + cenY;
 }
 
-void calculatePoint(int *result, long double cx, long double cy){
+const float bounds = 2.0;
+const int maxIterations = 100;
+
+void calculatePoint(long double cx, long double cy, int *iterations, int *isIn){
     long double zx = 0;
     long double zy = 0;
 
-    int i = 0;
+    *iterations = 0;
+    *isIn = 1;
 
-    float bounds = 2.0;
-    int isIn = 1;
-    int iterations = 100;
-
-    while(i < iterations && isIn == 1){
-        long double x = zx * zx - zy * zy + cx;
-        long double y = 2 * zx * zy + cy;
-        zx = x;
-        zy = y;
-        i++;
+    while(*iterations < maxIterations && *isIn == 1){
+        long double tzx = zx * zx - zy * zy + cx;
+        long double tzy = 2 * zx * zy + cy;
+        zx = tzx;
+        zy = tzy;
+        *iterations += 1;
         long double d = distance(0.0, 0.0, zx, zy);
-        if(d > bounds){
-            isIn = 0;
+        if(bounds < d){
+            *isIn = 0;
         }
     }
-
-    result[0] = i;
-    result[1] = isIn;
 }
 
-int mandelbrotSet(int *buffer, int width, int height){
-    long double c[2] = {0.0, 0.0};
-    int result[2] = {0, 0};
+void mandelbrotSet(uint8_t **buffer, int width, int height){
+    long double px = 0.0; 
+    long double py = 0.0;
+    
 
-    for(int x = 0; x < width; x++){
-        for(int y = 0; y < height; y++){
-            int index = 4 * (width * x + y);
+    for(int y = 0; y < height; y++){
+        for(int x = 0; x < width; x++){
+            int i = 4 * (y * width + x);
+
+            int iterations = 0;
+            int isIn = 0;
             
-            pixelToPoint(c, x, y, width, height);
-            calculatePoint(result, c[0], c[1]);
+            pixelToPoint(x, y, &px, &py, width, height);
+            calculatePoint(px, py, &iterations, &isIn);
 
-            int r, g, b, a;
-            if(result[1] == 1){
-                r = 0; g = 0; b = 0;
-            }
-            else if(result[0] > 1){
-                // float h = 150 + 200 - fmod(pow(result[0]/(70), 0.5) * 200, 255);
+            int r = 0; 
+            int g = 0; 
+            int b = 0;
+
+            if(1 < iterations && isIn == 0){
+                // float h = 150 + 200 - fmod(pow(iterations/70.0, 0.5) * 200, 255);
                 // float s = 100;
                 // float v = 100;
-                // int * rgb = HSVtoRGB(h, s, v);
-                // r = rgb[0];
-                // g = rgb[1];
-                // b = rgb[2];
+                // hsv2rgb(h, s, v, &r, &g, &b);
                 r = 255; g = 255; b = 255;
             }
-            else{
+            else if(isIn == 0){
                 r = 115; g = 115; b = 115;
             }
 
-            *(buffer + index + 0) = r;
-            *(buffer + index + 1) = g;
-            *(buffer + index + 2) = b;
-
-            *(buffer + index + 3) = 255;
+            *(*buffer + i + 0) = r;
+            *(*buffer + i + 1) = g;
+            *(*buffer + i + 2) = b;
+            *(*buffer + i + 3) = 255;
         }
     }
-
-    return 0;
 }
 
 int main(){
-    SDL_Event event;
-    SDL_Renderer *renderer;
-    SDL_Window *window;
-
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
         printf("Error initializing SDL: %s\n", SDL_GetError());
     }
@@ -171,22 +171,17 @@ int main(){
     // Create a window and renderer
     window = SDL_CreateWindow("Mandelbrot set", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-    SDL_RenderClear(renderer);
     
-    int *buffer = malloc(sizeof(int) * WINDOW_WIDTH * WINDOW_HEIGHT * 4);
+    uint8_t *buffer = NULL;
+    int r = newPixelBuffer(&buffer);
+    if(r){
+        printf("Error allocating memory for pixel buffer\n");
+        return 1;
+    }
 
-    printf("Generating mandelbrot set...\n");
-    mandelbrotSet(buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    printf("Drawing mandelbrot set..\n");
-    draw(renderer, buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    printf("Mandelbrot set was drawn..\n");
+    mandelbrotSet(&buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
+    update(buffer);
     
-    SDL_RenderPresent(renderer);
-    free(buffer);
-
     int run = 1;
     while(run){
         while(SDL_PollEvent(&event)){
@@ -195,12 +190,18 @@ int main(){
                 if(key == SDLK_q || key == SDLK_ESCAPE){
                     run = 0;
                 }
+                else if(key == SDLK_s){
+                    savePng("mandelbrotSet.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
+                    printf("Image saved\n");
+                }
             }
             else if(event.type == SDL_QUIT){
                 run = 0;
             }
         }
     }
+
+    free(buffer);
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

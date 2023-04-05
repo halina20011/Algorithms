@@ -9,4 +9,4 @@ live demo: https://halina20011.github.io/Canvas/MarchingSquares/marchingSquares.
 `mkdir Build` </br>
 
 ## Build and run
-`gcc main.c $(sdl2-config --cflags --libs) -o Build/main && ./Build/main` </br>
+`gcc main.c $(sdl2-config --cflags --libs) -lm -lpng -o Build/main && ./Build/main` </br>
