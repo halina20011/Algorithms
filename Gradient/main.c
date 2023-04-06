@@ -21,12 +21,15 @@
 #include "../pixel.c"
 #include "../pngWrapper.c"
 
+#include "../gradient.h"
+#include "../rgba.h"
+
 // for time() and clock()
 #include <time.h>
 #include <math.h>
 
 #define WINDOW_WIDTH 600
-#define WINDOW_HEIGHT 600
+#define WINDOW_HEIGHT 100
 
 const int WINDOWWIDTH = WINDOW_WIDTH;
 const int WINDOWHEIGHT = WINDOW_HEIGHT;
@@ -36,30 +39,32 @@ SDL_Renderer *renderer;
 SDL_Window *window;
 
 int generate(uint8_t **buffer){
-    unsigned seed = time(NULL); // time(0);
-    srand(seed);
+    struct RGBA colors[4] = {black, red, green, white};
+    int positions[4] = {0, 200, 400, WINDOW_WIDTH};
 
+    struct RGBA **gradient = NULL;
+    makeGradient(WINDOW_WIDTH, &gradient, colors, positions, 4);
+    
     for(int y = 0; y < WINDOW_HEIGHT; y++){
         for(int x = 0; x < WINDOW_WIDTH; x++){
             int i = 4 * (y * WINDOW_WIDTH + x);
-            *(*buffer + i + 0) = rand() % 255 + 1;
-            *(*buffer + i + 1) = rand() % 255 + 1;
-            *(*buffer + i + 2) = rand() % 255 + 1;
-            *(*buffer + i + 3) = 255;
+
+            *(*buffer + i + 0) = gradient[x]->r;
+            *(*buffer + i + 1) = gradient[x]->g;
+            *(*buffer + i + 2) = gradient[x]->b;
+            *(*buffer + i + 3) = gradient[x]->a;
         }
     }
+    clearGradient(&gradient, WINDOW_WIDTH);
 
     return 0;
 }
 
 int mainLoop(uint8_t **buffer){
     clock_t start = clock(), diff;
-    // printf("Generating...\n");
     generate(buffer);
 
-    // printf("Drawing...\n");
     update(*buffer);
-    // printf("Drawn...\n");
 
     diff = clock() - start;
     int msec = diff * 1000 / CLOCKS_PER_SEC;
@@ -101,7 +106,7 @@ int main(){
                     mainLoop(&buffer);
                 }
                 else if(key == SDLK_s){
-                    savePng("template.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
+                    savePng("gradient.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
                     printf("Image saved\n");
                 }
             }

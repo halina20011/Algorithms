@@ -1,13 +1,16 @@
 # Math Art
 Repo in which you can find the art of mathematics </br>
 
-## List
-Marching squares </br>
-![Preview](/Images/marchingSquares.png) </br>
-Mandelbrot set </br>
-![Preview](/Images/mandelbrotSet.png) </br>
+## Marching squares
+<img src="/Images/marchingSquares.png" alt="preview" width="300" style="height:auto;">
 
-Sorting Algorithms </br>
+## Mandelbrot set
+<img src="/Images/mandelbrotSet.png" alt="preview" width="300" style="height:auto;">
+
+## Tricorn
+<img src="/Images/tricorn.png" alt="preview" width="300" style="height:auto;">
+
+## Sorting Algorithms
 Bubble Sort </br>
 Selection Sort </br>
 Bogossort </br>
@@ -16,7 +19,7 @@ Gnome Sort </br>
 Odd-even Sort </br>
 Stooge Sort </br>
 Radix Sort </br>
-![Preview](/Images/bubbleSort.png) </br>
+<img src="/Images/bubbleSort.png" alt="preview" width="300" style="height:auto;">
 
 ## SDL2
 `yay -S sdl2` </br>

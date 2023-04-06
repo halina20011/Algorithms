@@ -23,6 +23,9 @@
 #include "../pixel.c"
 #include "../pngWrapper.c"
 
+#include "../gradient.h"
+#include "../rgba.h"
+
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 
@@ -37,20 +40,13 @@ float cenX = 0.0;
 float cenY = 0.0;
 float scale = 1.0;
 
-long double distance(long double x1, long double y1, long double x2, long double y2){
-    long double x = x2 - x1;
-    long double y = y2 - y1;
-
-    return hypot(x, y);
-}
+const float bounds = 4.0;
+const int maxIterations = 100;
 
 void pixelToPoint(int x, int y, long double *px, long double *py, int width, int height){
     *px = (x - width / 2.0) * (4.0 / width) * (1.0 / scale) + cenX;
     *py = (y - height / 2.0) * (4.0 / height) * (1.0 / scale) + cenY;
 }
-
-const float bounds = 2.0;
-const int maxIterations = 100;
 
 void calculatePoint(long double cx, long double cy, int *iterations, int *isIn){
     long double zx = 0;
@@ -61,11 +57,12 @@ void calculatePoint(long double cx, long double cy, int *iterations, int *isIn){
 
     while(*iterations < maxIterations && *isIn == 1){
         long double tzx = zx * zx - zy * zy + cx;
-        long double tzy = 2 * zx * zy + cy;
+        zy = -2 * zx * zy + cy;
         zx = tzx;
-        zy = tzy;
+
         *iterations += 1;
-        long double d = distance(0.0, 0.0, zx, zy);
+
+        long double d = hypot(zx, zy);
         if(bounds < d){
             *isIn = 0;
         }
@@ -75,7 +72,6 @@ void calculatePoint(long double cx, long double cy, int *iterations, int *isIn){
 void mandelbrotSet(uint8_t **buffer, int width, int height){
     long double px = 0.0; 
     long double py = 0.0;
-    
 
     for(int y = 0; y < height; y++){
         for(int x = 0; x < width; x++){
@@ -91,16 +87,15 @@ void mandelbrotSet(uint8_t **buffer, int width, int height){
             int g = 0; 
             int b = 0;
 
-            if(1 < iterations && isIn == 0){
-                // float h = 150 + 200 - fmod(pow(iterations/70.0, 0.5) * 200, 255);
-                // float s = 100;
-                // float v = 100;
-                // hsv2rgb(h, s, v, &r, &g, &b);
+            if(isIn == 0){
                 r = 255; g = 255; b = 255;
             }
-            else if(isIn == 0){
-                r = 115; g = 115; b = 115;
-            }
+            // else{
+            // float h = (255.0 * iterations / maxIterations);
+            //
+            // float v = (iterations < maxIterations) ? 100.0 : 0;
+            // hsv2rgb(h, 100.0, v, &r, &g, &b);
+            // }
 
             *(*buffer + i + 0) = r;
             *(*buffer + i + 1) = g;
@@ -110,7 +105,7 @@ void mandelbrotSet(uint8_t **buffer, int width, int height){
     }
 }
 
-int main(){
+int main(int argc, char **argv){
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
         printf("Error initializing SDL: %s\n", SDL_GetError());
     }
@@ -138,7 +133,7 @@ int main(){
                     run = 0;
                 }
                 else if(key == SDLK_s){
-                    savePng("mandelbrotSet.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
+                    savePng("tricorn.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
                     printf("Image saved\n");
                 }
             }
