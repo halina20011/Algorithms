@@ -40,7 +40,7 @@ void clear(uint8_t **buffer){
     }
 }
 
-void fill(uint8_t **buffer){
+void fillBuffer(uint8_t **buffer){
     for(int y = 0; y < WINDOWHEIGHT; y++){
         for(int x = 0; x < WINDOWWIDTH; x++){
             int i = 4 * (y * WINDOWWIDTH + x);

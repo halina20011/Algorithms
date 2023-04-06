@@ -66,15 +66,13 @@ void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortF
 
 size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
 
-int fill(int *array, int length, float increase){
+void fillArray(int *array, int length, float increase){
     for(int i = 0; i < length; i++){
         *(array + i) = (i + 1) * increase;
     }
-
-    return 0;
 }
 
-int shuffle(int *array, int length){
+void shuffle(int *array, int length){
     unsigned seed = time(NULL);
     srand(seed);
 
@@ -87,8 +85,6 @@ int shuffle(int *array, int length){
             array[i] = temp;
         }
     }
-
-    return 0;
 }
 
 void printArray(int *array, int length){
@@ -160,7 +156,7 @@ int main(int argc, char **argv){
     printf("Lengtht: %d increase: %f\n", length, increase);
     int *numbers = malloc(sizeof(int) * length);
     
-    fill(numbers, length, increase);
+    fillArray(numbers, length, increase);
     shuffle(numbers, length);
 
     void *(*initFunction)(uint8_t**, int*, int) = sortingAlgorithmsInit[runAlgorithmIndex];

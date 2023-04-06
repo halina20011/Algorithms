@@ -160,7 +160,7 @@ void marchingSquares(uint8_t **buffer, int **field, int columns, int rows, int r
     // }
 
     setColor(0, 0, 0, 255);
-    fill(buffer);
+    fillBuffer(buffer);
 
     // Set new color
     setColor(255, 0, 0, 255);

@@ -2,7 +2,7 @@
 
 extern int ended;
 extern int indexAnimation;
-extern int shuffle(int*, int);
+extern void shuffle(int*, int);
 
 void *bogosortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
