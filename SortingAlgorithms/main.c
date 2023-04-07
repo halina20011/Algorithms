@@ -18,6 +18,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
 
+#define CAPTURE_ON true
 #include "../pixel.c"
 #include "../pngWrapper.c"
 
@@ -48,6 +49,9 @@ const int WINDOWHEIGHT = WINDOW_HEIGHT;
 SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Event event;
+
+int capture = 0;
+uint16_t captureIndex = 0;
 
 const float frameRateTable[8] = {1, 2, 5, 10, 50, 100, 250, 500};
 const short int frameRateMaxIndex = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
@@ -106,27 +110,38 @@ void showOptions(){
 }
 
 int main(int argc, char **argv){
+    char *flagsArg = NULL;
+    char *indexArg = NULL;
+
     short runAlgorithmIndex = -1;
-    if(argc == 2){
-        // runAlgorithmIndex = atoi(argv[1]);
-        int s = sscanf(argv[1], "%d", &runAlgorithmIndex, sizeof(runAlgorithmIndex));
-
-        // Input is not a number
-        if(s == 0){
-            runAlgorithmIndex = -1;
-        }
-        else if(runAlgorithmIndex == -1){
-            runAlgorithmIndex = sortingAlgorithmsLength - 1;
-        }
-        else if(runAlgorithmIndex < -1 || sortingAlgorithmsLength <= runAlgorithmIndex){
-            printf("Valid range is <0; %i)\n", sortingAlgorithmsLength);
-            runAlgorithmIndex = 0;
-        }
-    }
-
-    if(runAlgorithmIndex < 0){
+    if(argc == 1){
         showOptions();
         return 1;
+    }
+    indexArg = (argc == 3) ? argv[2] : argv[1];
+    flagsArg = (argc == 3) ? argv[1] : NULL;
+    
+    // Convert
+    // runAlgorithmIndex = atoi(argv[1]);
+    int s = sscanf(indexArg, "%d", &runAlgorithmIndex, sizeof(runAlgorithmIndex));
+
+    // Input is not a number
+    if(s == 0){
+        runAlgorithmIndex = -1;
+    }
+    else if(runAlgorithmIndex == -1){
+        runAlgorithmIndex = sortingAlgorithmsLength - 1;
+    }
+    else if(runAlgorithmIndex < -1 || sortingAlgorithmsLength <= runAlgorithmIndex){
+        printf("Valid range is <0; %i)\n", sortingAlgorithmsLength);
+        runAlgorithmIndex = 0;
+    }
+
+    if(flagsArg != NULL){
+        if(memcmp(flagsArg, "-c", 2) == 0){
+            capture = 2;
+            printf("Capture is turned on\n");
+        }
     }
 
     printf("Algorithm: \"%s\"\n", sortingAlgorithmsNames[runAlgorithmIndex]);

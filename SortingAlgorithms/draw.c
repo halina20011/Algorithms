@@ -9,7 +9,9 @@ extern const int WINDOWHEIGHT;
 extern int indexAnimation;
 
 int drawFinalAnimation(uint8_t **buffer, int *numbers, int length, int width){
-    clear(buffer);
+    setColor(0, 0, 0, 255);
+    fillBuffer(buffer);
+    setColor(255, 255, 255, 255);
 
     for(int i = 0; i < length; i++){
         int x = i * width;
@@ -29,7 +31,9 @@ int drawFinalAnimation(uint8_t **buffer, int *numbers, int length, int width){
 }
 
 int drawNumbers(uint8_t **buffer, int *numbers, int length, int width, int indexItem1, int indexItem2){
-    clear(buffer);
+    setColor(0, 0, 0, 255);
+    fillBuffer(buffer);
+    setColor(255, 255, 255, 255);
 
     for(int i = 0; i < length; i++){
         int x = i * width;

@@ -6,6 +6,14 @@ extern const int WINDOWHEIGHT;
 
 extern SDL_Renderer *renderer;
 
+#ifdef CAPTURE_ON
+    #include "pngWrapper.c"
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    extern int capture;
+    extern uint16_t captureIndex;
+#endif
+
 int rgba[4] = {0};
 
 void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
@@ -32,6 +40,30 @@ void update(uint8_t *buffer){
 
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(texture);
+
+    #ifdef CAPTURE_ON
+    char fileName[6];
+    const char folderName[11] = "./Capture/";
+    char filePath[21];
+    if(capture == 2){
+        struct stat st = {0};
+        if(stat(folderName, &st) == -1){
+            mkdir(folderName, 0777);
+            printf("Folder was made\n");
+        }
+        capture = 1;
+    }
+    if(capture == 1){
+        // TODO: Posible integer overflow
+        // uint16_t = 2 ^ 16 - 1 => max number of didgets is 5 + \0
+        snprintf(fileName, 6, "%05hd", captureIndex++);
+        strncpy(filePath, folderName, 11);
+        strncat(filePath, fileName, 6);
+        strncat(filePath, ".png", 5);
+        // printf("Path: %s\n", filePath);
+        savePng(filePath, buffer, WINDOWWIDTH, WINDOWHEIGHT);
+    }
+    #endif
 }
 
 void clear(uint8_t **buffer){
