@@ -3,6 +3,8 @@
 extern int ended;
 extern int indexAnimation;
 
+extern void printArray(int*, int);
+
 void *bubbleSortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));
@@ -44,6 +46,32 @@ void swap(int *x, int *y){
     *(y) = temp;
 }
 
+// Example
+// int *numbersCopy = malloc(sizeof(int) * length);
+// memcpy(numbersCopy, numbers, sizeof(int) * length);
+// bubbleSortAlg(numbersCopy, length);
+// printArray(numbersCopy, length);
+void bubbleSortAlg(int *numbers, int length){
+    int isSorted = 1;
+
+    for(int i = 0; i < length - 1; i++){
+        isSorted = 1;
+
+        for(int j = 0; j < length - i - 1; j++){
+            if(numbers[j + 1] < numbers[j]){
+                swap(&numbers[j], &numbers[j + 1]);
+                isSorted = 0;
+            }
+        }
+
+        if(isSorted == 1){
+            break;
+        }
+    }
+
+    printArray(numbers, length);
+}
+
 Uint32 bubbleSort(Uint32 interval, void *param){
     uint8_t **buffer = *((uint8_t***) param);
     int *numbers    = *((int**) (param + sizeof(uint8_t*)));
@@ -59,18 +87,7 @@ Uint32 bubbleSort(Uint32 interval, void *param){
         drawNumbers(buffer, numbers, length, width, *(j), *(j) + 1);
         // int *i = NULL;
         // printf("%i", *i);
-
-        // If j is in the and i is still smaller than number of numbers 
-        // Firts foor lop
-        if(*(j) == length - *(i) - 1 && *(i) < length - 1){
-            if(*(sorted) == 1){
-                ended = 1;
-            }
-            *(sorted) = 1;
-            *(i) += 1;
-        }
         
-        // Worst case scenario we need to go n^2
         // Second foor lop
         if(*(i) < length){
             int n1 = numbers[*(j)];
@@ -81,13 +98,22 @@ Uint32 bubbleSort(Uint32 interval, void *param){
                 *(sorted) = 0;
             }
 
-            // While j is smaller than residue of unsorted numbers proceed
-            if(*(j) < length - *(i) - 1){
-                *(j) += 1;
+            *(j) += 1;
+        }
+        else{
+            ended = 1;
+        }
+
+        // Firts for loop
+        // If j reatched the end
+        if(*(j) == length - *(i) - 1){
+            if(*(sorted) == 1){
+                ended = 1;
             }
-            else{
-                *(j) = 0;
-            }
+
+            *(sorted) = 1;
+            *(i) += 1;
+            *(j) = 0;
         }
     }
     else{
