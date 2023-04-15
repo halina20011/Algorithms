@@ -35,56 +35,50 @@ struct RGBA white   = {255, 255, 255, 255};
 struct RGBA red     = {255,   0,   0, 255};
 struct RGBA green   = {  0, 255,   0, 255};
 
-int hsv2rgb(float H, float S, float V, int *r, int *g, int *b){
-    if(H < 0 || 360 < H || S < 0 || 100 < S || V < 0 || 100 < V){
-        *r = 0;
-        *g = 0;
-        *b = 0;
-        return 1;
+
+int hsv2rgb(float h, float s, float v, int *r, int *g, int *b){
+    if(1.0 < v){
+        v = 1.0;
+    } 
+        
+    float hp = h / 60.0;
+    float c = v * s;
+    float x = c * (1.0 - abs(((int)hp % 2) - 1.0));
+    float rgb[3] = {0};
+
+    if(0 <= hp && hp < 1){
+        rgb[0] = c;
+        rgb[1] = x;
+    }
+    if(1 <= hp && hp < 2){
+        rgb[0] = x;
+        rgb[1] = c;
+    }
+    if(2 <= hp && hp < 3){
+        rgb[1] = c;
+        rgb[2] = x;
+    }
+    if(3 <= hp && hp < 4){
+        rgb[1] = x;
+        rgb[2] = c;
+    }
+    if(4 <= hp && hp < 5){
+        rgb[0] = x;
+        rgb[2] = c;
+    }
+    if(5 <= hp && hp < 6){
+        rgb[0] = c;
+        rgb[2] = x;
     }
 
-    float s = S / 100;
-    float v = V / 100;
-    float C = s * v;
-    float X = C * (1 - abs(fmod(H / 60.0, 2) - 1));
-    float m = v - C;
-    float _r, _g, _b;
+    float m = v - c;
+    rgb[0] += m;
+    rgb[1] += m;
+    rgb[2] += m;
 
-    if(H >= 0 && H < 60){
-        _r = C;
-        _g = X;
-        _b = 0;
-    }
-    else if(H >= 60 && H < 120){
-        _r = X;
-        _g = C;
-        _b = 0;
-    }
-    else if(H >= 120 && H < 180){
-        _r = 0;
-        _g = C;
-        _b = X;
-    }
-    else if(H >= 180 && H < 240){
-        _r = 0;
-        _g = X;
-        _b = C;
-    }
-    else if(H >= 240 && H < 300){
-        _r = X;
-        _g = 0;
-        _b = C;
-    }
-    else{
-        _r = C;
-        _g = 0;
-        _b = X;
-    }
-
-    *r = (int)(_r + m) * 255;
-    *g = (int)(_g + m) * 255;
-    *b = (int)(_b + m) * 255;
-
-    return 0;
+    *r = rgb[0] * 255;
+    *g = rgb[1] * 255;
+    *b = rgb[2] * 255;
 }
+
 #endif

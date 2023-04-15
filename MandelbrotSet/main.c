@@ -22,6 +22,7 @@
 
 #include "../pixel.c"
 #include "../pngWrapper.c"
+#include "../rgba.h"
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
@@ -37,20 +38,13 @@ float cenX = 0.0;
 float cenY = 0.0;
 float scale = 1.0;
 
-long double distance(long double x1, long double y1, long double x2, long double y2){
-    long double x = x2 - x1;
-    long double y = y2 - y1;
-
-    return hypot(x, y);
-}
+const float bounds = 2.0;
+const int maxIterations = 100;
 
 void pixelToPoint(int x, int y, long double *px, long double *py, int width, int height){
     *px = (x - width / 2.0) * (4.0 / width) * (1.0 / scale) + cenX;
     *py = (y - height / 2.0) * (4.0 / height) * (1.0 / scale) + cenY;
 }
-
-const float bounds = 2.0;
-const int maxIterations = 100;
 
 void calculatePoint(long double cx, long double cy, int *iterations, int *isIn){
     long double zx = 0;
@@ -61,21 +55,25 @@ void calculatePoint(long double cx, long double cy, int *iterations, int *isIn){
 
     while(*iterations < maxIterations && *isIn == 1){
         long double tzx = zx * zx - zy * zy + cx;
-        long double tzy = 2 * zx * zy + cy;
+        zy = 2 * zx * zy + cy;
         zx = tzx;
-        zy = tzy;
+
         *iterations += 1;
-        long double d = distance(0.0, 0.0, zx, zy);
+
+        float d = hypot(zx, zy);
         if(bounds < d){
             *isIn = 0;
         }
     }
 }
 
+float smoothColor(float n, float x, float y){
+    return 1.0 + n - log(log(hypot(x, y))) / log(2.0);
+}
+
 void mandelbrotSet(uint8_t **buffer, int width, int height){
     long double px = 0.0; 
     long double py = 0.0;
-    
 
     for(int y = 0; y < height; y++){
         for(int x = 0; x < width; x++){
@@ -91,16 +89,25 @@ void mandelbrotSet(uint8_t **buffer, int width, int height){
             int g = 0; 
             int b = 0;
 
-            if(1 < iterations && isIn == 0){
-                // float h = 150 + 200 - fmod(pow(iterations/70.0, 0.5) * 200, 255);
-                // float s = 100;
-                // float v = 100;
-                // hsv2rgb(h, s, v, &r, &g, &b);
-                r = 255; g = 255; b = 255;
-            }
-            else if(isIn == 0){
-                r = 115; g = 115; b = 115;
-            }
+            // float val = smoothColor((float)iterations, (float)px, (float)py) / (float)maxIterations;
+            // val = (isnan(val) == 1) ? (float)iterations/(float)maxIterations : val;
+            // printf("%f\n", val);
+            float val = (float)iterations/(float)maxIterations;
+            float h = 360.0 * val;
+            float v = 10.0  * val;
+
+            hsv2rgb(h, 1.0, v, &b, &g, &r);
+
+            // if(1 < iterations && isIn == 0){
+            //     // float h = 150 + 200 - fmod(pow(iterations/70.0, 0.5) * 200, 255);
+            //     // float s = 100;
+            //     // float v = 100;
+            //     // hsv2rgb(h, s, v, &r, &g, &b);
+            //     r = 255; g = 255; b = 255;
+            // }
+            // else if(isIn == 0){
+            //     r = 115; g = 115; b = 115;
+            // }
 
             *(*buffer + i + 0) = r;
             *(*buffer + i + 1) = g;
