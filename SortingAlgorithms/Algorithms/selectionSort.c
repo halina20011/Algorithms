@@ -3,6 +3,8 @@
 extern int ended;
 extern int finalAnimation;
 
+#define SELECTIONSORT {"Selection Sort", &selectionSort, &selectionSortAlg, &selectionSortInit, &selectionSortFree}
+
 void *selectionSortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));

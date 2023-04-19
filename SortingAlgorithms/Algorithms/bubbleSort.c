@@ -5,6 +5,8 @@ extern int indexAnimation;
 
 extern void printArray(int*, int);
 
+#define BUBBLESORT {"Bubble Sort", &bubbleSort, &bubbleSortAlg, &bubbleSortInit, &bubbleSortFree}
+
 void *bubbleSortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));

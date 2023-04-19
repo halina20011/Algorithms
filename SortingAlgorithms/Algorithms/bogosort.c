@@ -4,6 +4,8 @@ extern int ended;
 extern int indexAnimation;
 extern void shuffle(int*, int);
 
+#define BOGOSORT {"Bogosort", &bogosort, NULL, &bogosortInit, &bogosortFree}
+
 void *bogosortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
     int *sorted = malloc(sizeof(int));

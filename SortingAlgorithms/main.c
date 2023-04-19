@@ -18,7 +18,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
 
-#define CAPTURE_ON true
+// #define CAPTURE_ON true
 #include "../pixel.c"
 #include "../pngWrapper.c"
 
@@ -63,12 +63,17 @@ unsigned short frameRateIndex = 5;
 int ended = 0;
 int indexAnimation = 0;
 
-void *sortingAlgorithms[] = {&bubbleSort, &selectionSort, &bogosort, &insertionSort, &gnomeSort, &oddevenSort, &stoogeSort, &radixSort};
-char *sortingAlgorithmsNames[] = {"Bubble Sort", "Selection Sort", "Bogosort", "Insertion Sort", "Gnome Sort", "Odd-even Sort", "Stooge Sort", "Radix Sort"};
-void *sortingAlgorithmsInit[] = {&bubbleSortInit, &selectionSortInit, &bogosortInit, &insertionSortInit, &gnomeSortInit, &oddevenSortInit, &stoogeSortInit, &radixSortInit};
-void *sortingAlgorithmsFree[] = {&bubbleSortFree, &selectionSortFree, &bogosortFree, &insertionSortFree, &gnomeSortFree, &oddevenSortFree, &stoogeSortFree, &radixSortFree};
+typedef struct Algorithm{
+    const char *name;
+    const void *algorithm;
+    const void *testAlgorithm;
+    const void *init;
+    const void *free;
+} Algorithm;
 
-size_t sortingAlgorithmsLength = sizeof(sortingAlgorithms) / sizeof(sortingAlgorithms[0]);
+Algorithm algorithms[] = {BUBBLESORT, SELECTIONSORT, BOGOSORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, RADIXSORT};
+
+size_t sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
 
 void fillArray(int *array, int length, float increase){
     for(int i = 0; i < length; i++){
@@ -105,7 +110,7 @@ void showOptions(){
     printf("   -1\t\t[Run the last algorithm]\n");
 
     for(int i = 0; i < sortingAlgorithmsLength; i++){
-        printf("%5d\t\t%s\n", i, sortingAlgorithmsNames[i]);
+        printf("%5d\t\t%s\n", i, algorithms[i].name);
     }
 }
 
@@ -144,7 +149,7 @@ int main(int argc, char **argv){
         }
     }
 
-    printf("Algorithm: \"%s\"\n", sortingAlgorithmsNames[runAlgorithmIndex]);
+    printf("Algorithm: \"%s\"\n", algorithms[runAlgorithmIndex].name);
     
     // Initialize SDL2
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
@@ -174,10 +179,10 @@ int main(int argc, char **argv){
     fillArray(numbers, length, increase);
     shuffle(numbers, length);
 
-    void *(*initFunction)(uint8_t**, int*, int) = sortingAlgorithmsInit[runAlgorithmIndex];
-    void *(*freeFunction)(void *param) = sortingAlgorithmsFree[runAlgorithmIndex];
+    void *(*initFunction)(uint8_t**, int*, int) = algorithms[runAlgorithmIndex].init;
+    void *(*freeFunction)(void *param) = algorithms[runAlgorithmIndex].free;
     void *param = (*initFunction)(&buffer, numbers, width);
-    void *func = sortingAlgorithms[runAlgorithmIndex];
+    const void *func = algorithms[runAlgorithmIndex].algorithm;
     
     // Schedule the first frame
     SDL_TimerID timer = SDL_AddTimer(frameDelay, func, param);

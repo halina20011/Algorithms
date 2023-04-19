@@ -6,6 +6,8 @@ extern int ended;
 extern int indexAnimation;
 extern void printArray(int*, int);
 
+#define RADIXSORT {"Radix Sort", &radixSort, &radixSortAlg, &radixSortInit, &radixSortFree}
+
 #define headsSize 10
 
 void *radixSortInit(uint8_t **buffer, int *numbers, int width){

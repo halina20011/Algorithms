@@ -3,6 +3,8 @@
 extern int ended;
 extern int indexAnimation;
 
+#define GNOMESORT {"Gnome Sort", &gnomeSort, gnomeSortAlg, &gnomeSortInit, &gnomeSortFree}
+
 void *gnomeSortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
     

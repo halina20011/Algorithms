@@ -3,6 +3,8 @@
 extern int ended;
 extern int indexAnimation;
 
+#define ODDEVENSORT {"Odd-even Sort", &oddevenSort, NULL, &oddevenSortInit, &oddevenSortFree}
+
 void *oddevenSortInit(uint8_t **buffer, int *numbers, int width){
     int *i      = malloc(sizeof(int));
     int *sorted = malloc(sizeof(int));

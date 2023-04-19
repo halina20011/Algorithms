@@ -4,6 +4,8 @@
 extern int ended;
 extern int indexAnimation;
 
+#define STOOGESORT {"Stooge Sort", &stoogeSort, &stoogeSortAlg, &stoogeSortInit, &stoogeSortFree}
+
 void *stoogeSortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));

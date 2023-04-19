@@ -4,6 +4,8 @@ extern int ended;
 extern int indexAnimation;
 void printArray(int *, int);
 
+#define INSERTIONSORT {"Insertion Sort", &insertionSort, &insertionSortAlg, &insertionSortInit, &insertionSortFree}
+
 void *insertionSortInit(uint8_t **buffer, int *numbers, int width){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));
