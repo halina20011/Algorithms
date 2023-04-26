@@ -39,6 +39,7 @@
 #include "Algorithms/oddevenSort.c"
 #include "Algorithms/stoogeSort.c"
 #include "Algorithms/radixSort.c"
+#include "Algorithms/cocktailSort.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -51,6 +52,7 @@ SDL_Renderer *renderer;
 SDL_Event event;
 
 int capture = 0;
+// int capture = 2;
 uint16_t captureIndex = 0;
 
 const float frameRateTable[8] = {1, 2, 5, 10, 50, 100, 250, 500};
@@ -71,7 +73,7 @@ typedef struct Algorithm{
     const void *free;
 } Algorithm;
 
-Algorithm algorithms[] = {BUBBLESORT, SELECTIONSORT, BOGOSORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, RADIXSORT};
+Algorithm algorithms[] = {BUBBLESORT, SELECTIONSORT, BOGOSORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, RADIXSORT, COCKTAILSORT};
 
 size_t sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
 
@@ -118,7 +120,7 @@ int main(int argc, char **argv){
     char *flagsArg = NULL;
     char *indexArg = NULL;
 
-    short runAlgorithmIndex = -1;
+    int runAlgorithmIndex = -1;
     if(argc == 1){
         showOptions();
         return 1;
@@ -128,7 +130,7 @@ int main(int argc, char **argv){
     
     // Convert
     // runAlgorithmIndex = atoi(argv[1]);
-    int s = sscanf(indexArg, "%d", &runAlgorithmIndex, sizeof(runAlgorithmIndex));
+    int s = sscanf(indexArg, "%i", &runAlgorithmIndex);
 
     // Input is not a number
     if(s == 0){
@@ -138,7 +140,7 @@ int main(int argc, char **argv){
         runAlgorithmIndex = sortingAlgorithmsLength - 1;
     }
     else if(runAlgorithmIndex < -1 || sortingAlgorithmsLength <= runAlgorithmIndex){
-        printf("Valid range is <0; %i)\n", sortingAlgorithmsLength);
+        printf("Valid range is <0; %li)\n", sortingAlgorithmsLength);
         runAlgorithmIndex = 0;
     }
 
@@ -183,7 +185,13 @@ int main(int argc, char **argv){
     void *(*freeFunction)(void *param) = algorithms[runAlgorithmIndex].free;
     void *param = (*initFunction)(&buffer, numbers, width);
     const void *func = algorithms[runAlgorithmIndex].algorithm;
-    
+
+    // int *numbersCopy = malloc(sizeof(int) * length);
+    // memcpy(numbersCopy, numbers, sizeof(int) * length);
+    // void *(*testAlgorithm)(int*, int) = algorithms[runAlgorithmIndex].testAlgorithm;
+    // (*testAlgorithm)(numbersCopy, length);
+    // free(numbersCopy);
+
     // Schedule the first frame
     SDL_TimerID timer = SDL_AddTimer(frameDelay, func, param);
     
