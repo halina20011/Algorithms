@@ -25,6 +25,10 @@ Radix Sort </br>
 `yay -S sdl2` </br>
 `yay -S sdl2_image` </br>
 
+## Ubuntu
+`sudo apt-get install libsdl2-dev` </br>
+`sudo apt-get install libpng-dev` </br>
+
 ## Setup
 `cd [name]` </br>
 `mkdir Build` </br>

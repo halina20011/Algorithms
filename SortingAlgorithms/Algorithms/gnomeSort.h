@@ -1,29 +1,30 @@
 #include "../draw.c"
+#include "../func.h"
 
-extern int ended;
+extern uint8_t *buffer;
+extern int *numbers;
+extern const unsigned int width;
+extern const int length;
+
 extern int indexAnimation;
 
 #define GNOMESORT {"Gnome Sort", &gnomeSort, gnomeSortAlg, &gnomeSortInit, &gnomeSortFree}
 
-void *gnomeSortInit(uint8_t **buffer, int *numbers, int width){
+void *gnomeSortInit(){
     int *i = malloc(sizeof(int));
     
     *(i) = 0;
 
-    size_t paramSize = sizeof(uint8_t*) + sizeof(int*) * 2 + sizeof(int);
-    printf("Param size: %zu\n", paramSize);
+    size_t paramSize = sizeof(int*);
 
     void *param = malloc(paramSize);
-    *((uint8_t***) (param)) = buffer;
-    *((int**) (param + sizeof(uint8_t*))) = numbers;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1)) = i;
-    *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 2)) = width;
+    *((int**) (param + sizeof(int*))) = i;
 
     return param;
 }
 
 int gnomeSortFree(void *param){
-    int *i  = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
+    int *i  = *((int**) (param + sizeof(int*)));
     
     free(i);
 
@@ -58,16 +59,11 @@ int gnomeSortAlg(int *numbers, int length){
 }
 
 Uint32 gnomeSort(Uint32 interval, void *param){
-    uint8_t **buffer = *((uint8_t***) param);
-    int *numbers    = *((int**) (param + sizeof(uint8_t*)));
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int width       = *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-
-    int length = WINDOWWIDTH / width;
+    int *i          = *((int**) (param + sizeof(int*)));
 
     // If array isn't yet sorted
     if(*(i) < length){
-        drawNumbers(buffer, numbers, length, width, *(i), *(i) + 1);
+        drawNumbers(&buffer, numbers, length, width, *(i), *(i) + 1);
         
         if(*(i) == -1){
             *(i) += 1;
@@ -83,7 +79,7 @@ Uint32 gnomeSort(Uint32 interval, void *param){
     }
     else{
         if(indexAnimation++ < length){
-            drawFinalAnimation(buffer, numbers, length, width);
+            drawFinalAnimation(&buffer, numbers, length, width);
         }
     }
     

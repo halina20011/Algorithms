@@ -1,23 +1,25 @@
-#include "../draw.c"
-
 #include <stdbool.h>
 
-extern int ended;
-extern int indexAnimation;
+#include "../draw.c"
+#include "../func.h"
 
-extern void printArray(int*, int);
+extern uint8_t *buffer;
+extern int *numbers;
+extern const unsigned int width;
+extern const int length;
+
+extern bool ended;
+extern int indexAnimation;
 
 #define COCKTAILSORT {"Cocktail Sort", &cocktailSort, &cocktailSortAlg, &cocktailSortInit, &cocktailSortFree}
 
-void *cocktailSortInit(uint8_t **buffer, int *numbers, int width){
+void *cocktailSortInit(){
     int *i = malloc(sizeof(int));
     int *start = malloc(sizeof(int));
     int *end = malloc(sizeof(int));
 
     bool *direction = malloc(sizeof(bool));
     bool *sorted = malloc(sizeof(bool));
-    
-    int length = WINDOWWIDTH / width;
     
     *i = 0;
     *start = 0;
@@ -26,28 +28,24 @@ void *cocktailSortInit(uint8_t **buffer, int *numbers, int width){
     *direction = 0;
     *sorted = true;
 
-    size_t paramSize = sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(bool*) * 2 + sizeof(int);
-    printf("Param size: %zu\n", paramSize);
+    size_t paramSize = sizeof(int*) * 3 + sizeof(bool*) * 2;
 
     void *param = malloc(paramSize);
-    *((uint8_t***) (param)) = buffer;
-    *((int**) (param + sizeof(uint8_t*))) = numbers;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1)) = i;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2)) = start;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3)) = end;
-    *((bool**) (param + sizeof(uint8_t*) + sizeof(int*) * 4)) = direction;
-    *((bool**)  (param + sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(bool*))) = sorted;
-    *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(bool*) * 2)) = width;
+    *((int**) (param + sizeof(int*) * 0)) = i;
+    *((int**) (param + sizeof(int*) * 1)) = start;
+    *((int**) (param + sizeof(int*) * 2)) = end;
+    *((bool**) (param + sizeof(int*) * 3)) = direction;
+    *((bool**)  (param + sizeof(int*) * 3 + sizeof(bool*))) = sorted;
 
     return param;
 }
 
 int cocktailSortFree(void *param){
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *start      = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *end        = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
-    bool *direction = *((bool**) (param + sizeof(uint8_t*) + sizeof(int*) * 4));
-    bool *sorted    = *((bool**) (param + sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(bool*)));
+    int *i          = *((int**) (param + sizeof(int*) * 0));
+    int *start      = *((int**) (param + sizeof(int*) * 1));
+    int *end        = *((int**) (param + sizeof(int*) * 2));
+    bool *direction = *((bool**) (param + sizeof(int*) * 3));
+    bool *sorted    = *((bool**) (param + sizeof(int*) * 3 + sizeof(bool*)));
     
     free(i);
     free(start);
@@ -89,23 +87,18 @@ void cocktailSortAlg(int *numbers, int length){
 }
 
 Uint32 cocktailSort(Uint32 interval, void *param){
-    uint8_t **buffer = *((uint8_t***) param);
-    int *numbers    = *((int**) (param + sizeof(uint8_t*)));
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *start      = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *end        = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
-    bool *direction = *((bool**) (param + sizeof(uint8_t*) + sizeof(int*) * 4));
-    bool *sorted    = *((bool**) (param + sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(bool*)));
-    int width       = *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(bool*) * 2));
-
-    int length = WINDOWWIDTH / width;
+    int *i          = *((int**) (param + sizeof(int*) * 0));
+    int *start      = *((int**) (param + sizeof(int*) * 1));
+    int *end        = *((int**) (param + sizeof(int*) * 2));
+    bool *direction = *((bool**) (param + sizeof(int*) * 3));
+    bool *sorted    = *((bool**) (param + sizeof(int*) * 3 + sizeof(bool*)));
     
     // If array isn't yet sorted
     if(ended == 0){
         // direction false = from left to right
         //           true  = from right to left
         if(*direction == 0){
-            drawNumbers(buffer, numbers, length, width, *(i), *(i) + 1);
+            drawNumbers(&buffer, numbers, length, width, *(i), *(i) + 1);
             // on the start of the loop
             if(*i < *end){
                 if(numbers[*i + 1] < numbers[*i]){
@@ -126,7 +119,7 @@ Uint32 cocktailSort(Uint32 interval, void *param){
             }
         }
         else{
-            drawNumbers(buffer, numbers, length, width, *(i) - 1, *(i));
+            drawNumbers(&buffer, numbers, length, width, *(i) - 1, *(i));
             if(*start < *i){
                 if(numbers[*i] < numbers[*i - 1]){
                     swap(&numbers[*i], &numbers[*i - 1]);
@@ -147,7 +140,7 @@ Uint32 cocktailSort(Uint32 interval, void *param){
     }
     else{
         if(indexAnimation++ < length){
-            drawFinalAnimation(buffer, numbers, length, width);
+            drawFinalAnimation(&buffer, numbers, length, width);
         }
     }
     

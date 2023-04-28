@@ -1,8 +1,15 @@
 #include <limits.h>
+
 #include "../draw.c"
 #include "../singleLinkedList.h"
+#include "../func.h"
 
-extern int ended;
+extern uint8_t *buffer;
+extern int *numbers;
+extern const unsigned int width;
+extern const int length;
+
+extern bool ended;
 extern int indexAnimation;
 extern void printArray(int*, int);
 
@@ -10,7 +17,7 @@ extern void printArray(int*, int);
 
 #define headsSize 10
 
-void *radixSortInit(uint8_t **buffer, int *numbers, int width){
+void *radixSortInit(){
     int *i = malloc(sizeof(int));
     int *d = malloc(sizeof(int));
     int *m = malloc(sizeof(int));
@@ -28,27 +35,24 @@ void *radixSortInit(uint8_t **buffer, int *numbers, int width){
         *(heads + i) = head;
     }
 
-    size_t paramSize = sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(int) + sizeof(struct Node*) * headsSize;
+    size_t paramSize = sizeof(int*) * 4 + sizeof(struct Node*) * headsSize;
 
     void *param = malloc(paramSize);
-    *((uint8_t***) (param)) = buffer;
-    *((int**) (param + sizeof(uint8_t*))) = numbers;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1)) = i;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2)) = d;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3)) = m;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 4)) = headsIndex;
-    *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 5)) = width;
-    *((struct Node***) (param + sizeof(uint8_t*) + sizeof(int*) * 6)) = heads;
+    *((int**) (param + sizeof(int*) * 0)) = i;
+    *((int**) (param + sizeof(int*) * 1)) = d;
+    *((int**) (param + sizeof(int*) * 2)) = m;
+    *((int**) (param + sizeof(int*) * 3)) = headsIndex;
+    *((struct Node***) (param + sizeof(int*) * 4)) = heads;
 
     return param;
 }
 
 int radixSortFree(void *param){
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *d          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *m          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
-    int *headsIndex = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 4));
-    struct Node **n = *((struct Node***) (param + sizeof(uint8_t*) + sizeof(int*) * 6));
+    int *i          = *((int**) (param + sizeof(int*) * 0));
+    int *d          = *((int**) (param + sizeof(int*) * 1));
+    int *m          = *((int**) (param + sizeof(int*) * 2));
+    int *headsIndex = *((int**) (param + sizeof(int*) * 3));
+    struct Node **n = *((struct Node***) (param + sizeof(int*) * 4));
     
     free(i);
     free(d);
@@ -96,9 +100,9 @@ int radixSortAlg(int *numbers, int length){
         }
 
         int *p = numbers;
+
         for(int n = 0; n < 10; n++){
             // printNodes(*(heads + n));
-
             int d = delete((heads + n), 1);
             while(d != INT_MIN){
                 *p++ = d;
@@ -118,16 +122,11 @@ int radixSortAlg(int *numbers, int length){
 }
 
 Uint32 radixSort(Uint32 interval, void *param){
-    uint8_t **buffer    = *((uint8_t***) param);
-    int *numbers        = *((int**) (param + sizeof(uint8_t*)));
-    int *i              = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *d              = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *m              = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
-    int *headsIndex     = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 4));
-    int width           = *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 5));
-    struct Node **heads = *((struct Node***) (param + sizeof(uint8_t*) + sizeof(int*) * 6));
-
-    int length = WINDOWWIDTH / width;
+    int *i              = *((int**) (param + sizeof(int*) * 0));
+    int *d              = *((int**) (param + sizeof(int*) * 1));
+    int *m              = *((int**) (param + sizeof(int*) * 2));
+    int *headsIndex     = *((int**) (param + sizeof(int*) * 3));
+    struct Node **heads = *((struct Node***) (param + sizeof(int*) * 4));
 
     // loop and find maximum number (d < 0)
     // loop throw all n digets (0 < d)
@@ -136,7 +135,7 @@ Uint32 radixSort(Uint32 interval, void *param){
     // If array isn't yet sorted
     if(ended == 0){
         if(*d < 0){
-            drawNumbers(buffer, numbers, length, width, *(i), *(i));
+            drawNumbers(&buffer, numbers, length, width, *(i), *(i));
 
             if(*i < length){
                 if(*m < *(numbers + *i)){
@@ -160,7 +159,7 @@ Uint32 radixSort(Uint32 interval, void *param){
 
             // when i is <0; length)
             if(-1 < *i && *i < length){
-                drawNumbers(buffer, numbers, length, width, *(i), *(i));
+                drawNumbers(&buffer, numbers, length, width, *(i), *(i));
 
                 int n = ((int)(*(numbers + *i) / *d)) % 10;
                 add(*(heads + n), *(numbers + *i));
@@ -172,7 +171,7 @@ Uint32 radixSort(Uint32 interval, void *param){
             else if(*i < 0){
                 // Just convert the negative number to positiv index
                 int ni = length + *i;
-                drawNumbers(buffer, numbers, length, width, ni, ni);
+                drawNumbers(&buffer, numbers, length, width, ni, ni);
                 
                 // Try to delete first item from current head in linked list 
                 // if it returns INT_MIN it means the current head is empty
@@ -200,7 +199,7 @@ Uint32 radixSort(Uint32 interval, void *param){
     }
     else{
         if(indexAnimation++ < length){
-            drawFinalAnimation(buffer, numbers, length, width);
+            drawFinalAnimation(&buffer, numbers, length, width);
         }
     }
     

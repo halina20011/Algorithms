@@ -1,17 +1,21 @@
 #include <math.h>
-#include "../draw.c"
 
-extern int ended;
+#include "../draw.c"
+#include "../func.h"
+
+extern uint8_t *buffer;
+extern int *numbers;
+extern const unsigned int width;
+extern const int length;
+
 extern int indexAnimation;
 
 #define STOOGESORT {"Stooge Sort", &stoogeSort, &stoogeSortAlg, &stoogeSortInit, &stoogeSortFree}
 
-void *stoogeSortInit(uint8_t **buffer, int *numbers, int width){
+void *stoogeSortInit(){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));
     int *pos = malloc(sizeof(int));
-       
-    int length = WINDOWWIDTH / width;
 
     *(i) = 0;
     *(j) = length - 1;
@@ -22,26 +26,22 @@ void *stoogeSortInit(uint8_t **buffer, int *numbers, int width){
     stack[0] = 0;
     stack[1] = length - 1;
 
-    size_t paramSize = sizeof(uint8_t*) + sizeof(int*) * 5 + sizeof(int);
-    printf("Param size: %zu\n", paramSize);
+    size_t paramSize = sizeof(int*) * 4;
 
     void *param = malloc(paramSize);
-    *((uint8_t***) (param)) = buffer;
-    *((int**) (param + sizeof(uint8_t*))) = numbers;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1)) = i;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2)) = j;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3)) = pos;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 4)) = stack;
-    *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 5)) = width;
+    *((int**) (param + sizeof(int*) * 0)) = i;
+    *((int**) (param + sizeof(int*) * 1)) = j;
+    *((int**) (param + sizeof(int*) * 2)) = pos;
+    *((int**) (param + sizeof(int*) * 3)) = stack;
 
     return param;
 }
 
 int *stoogeSortFree(void *param){
-    int *i      = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *j      = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *pos    = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
-    int *stack  = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 4));
+    int *i      = *((int**) (param + sizeof(int*) * 0));
+    int *j      = *((int**) (param + sizeof(int*) * 1));
+    int *pos    = *((int**) (param + sizeof(int*) * 2));
+    int *stack  = *((int**) (param + sizeof(int*) * 3));
     
     free(i);
     free(j);
@@ -56,7 +56,7 @@ int *stoogeSortFree(void *param){
 // memcpy(numbersCopy, numbers, sizeof(int) * length);
 // stoogeSortAlg(numbersCopy, length);
 // printArray(numbersCopy, length);
-int stoogeSortAlg(int *numbers, int length){
+void stoogeSortAlg(int *numbers, int length){
     int i = 0;
     int j = length - 1;
     int pos = 1;
@@ -106,13 +106,10 @@ int stoogeSortAlgRecursive(int *numbers, int length, int i){
 }
 
 Uint32 stoogeSort(Uint32 interval, void *param){
-    uint8_t **buffer = *((uint8_t***) param);
-    int *numbers    = *((int**) (param + sizeof(uint8_t*)));
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *j          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *pos        = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
-    int *stack      = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 4));
-    int width       = *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 5));
+    int *i          = *((int**) (param + sizeof(int*) * 0));
+    int *j          = *((int**) (param + sizeof(int*) * 1));
+    int *pos        = *((int**) (param + sizeof(int*) * 2));
+    int *stack      = *((int**) (param + sizeof(int*) * 3));
 
     int length = WINDOWWIDTH / width;
 
@@ -143,14 +140,14 @@ Uint32 stoogeSort(Uint32 interval, void *param){
 
             if(numbers[*(j)] < numbers[*(i)]){
                 swap(&numbers[*(i)], &numbers[*(j)]);
-                drawNumbers(buffer, numbers, length, width, *(i), *(j));
+                drawNumbers(&buffer, numbers, length, width, *(i), *(j));
                 break;
             }
         }
     }
     else{
         if(indexAnimation++ < length){
-            drawFinalAnimation(buffer, numbers, length, width);
+            drawFinalAnimation(&buffer, numbers, length, width);
         }
     }
 

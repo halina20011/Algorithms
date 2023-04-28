@@ -1,13 +1,18 @@
 #include "../draw.c"
 
-extern int ended;
+extern uint8_t *buffer;
+extern int *numbers;
+extern const unsigned int width;
+extern const int length;
+
+extern bool ended;
 extern int indexAnimation;
 
 extern void printArray(int*, int);
 
 #define BUBBLESORT {"Bubble Sort", &bubbleSort, &bubbleSortAlg, &bubbleSortInit, &bubbleSortFree}
 
-void *bubbleSortInit(uint8_t **buffer, int *numbers, int width){
+void *bubbleSortInit(){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));
     int *sorted = malloc(sizeof(int));
@@ -16,36 +21,26 @@ void *bubbleSortInit(uint8_t **buffer, int *numbers, int width){
     *(j) = 0;
     *(sorted) = 0;
 
-    size_t paramSize = sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(int);
-    printf("Param size: %zu\n", paramSize);
+    size_t paramSize = sizeof(int*) * 3;
 
     void *param = malloc(paramSize);
-    *((uint8_t***) (param)) = buffer;
-    *((int**) (param + sizeof(uint8_t*))) = numbers;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1)) = i;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2)) = j;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3)) = sorted;
-    *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 4)) = width;
+    *((int**) (param + sizeof(int*) * 0)) = i;
+    *((int**) (param + sizeof(int*) * 1)) = j;
+    *((int**) (param + sizeof(int*) * 2)) = sorted;
 
     return param;
 }
 
 int bubbleSortFree(void *param){
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *j          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *sorted     = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
+    int *i          = *((int**) (param + sizeof(int*) * 0));
+    int *j          = *((int**) (param + sizeof(int*) * 1));
+    int *sorted     = *((int**) (param + sizeof(int*) * 2));
     
     free(i);
     free(j);
     free(sorted);
 
     return 0;
-}
-
-void swap(int *x, int *y){
-    int temp = *(x);
-    *(x) = *(y);
-    *(y) = temp;
 }
 
 // Example
@@ -75,18 +70,13 @@ void bubbleSortAlg(int *numbers, int length){
 }
 
 Uint32 bubbleSort(Uint32 interval, void *param){
-    uint8_t **buffer = *((uint8_t***) param);
-    int *numbers    = *((int**) (param + sizeof(uint8_t*)));
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *j          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *sorted     = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
-    int width       = *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 4));
-
-    int length = WINDOWWIDTH / width;
+    int *i          = *((int**) (param + sizeof(int*) * 0));
+    int *j          = *((int**) (param + sizeof(int*) * 1));
+    int *sorted     = *((int**) (param + sizeof(int*) * 2));
 
     // If array isn't yet sorted
     if(ended == 0){
-        drawNumbers(buffer, numbers, length, width, *(j), *(j) + 1);
+        drawNumbers(&buffer, numbers, length, width, *(j), *(j) + 1);
         // int *i = NULL;
         // printf("%i", *i);
         
@@ -120,7 +110,7 @@ Uint32 bubbleSort(Uint32 interval, void *param){
     }
     else{
         if(indexAnimation++ < length){
-            drawFinalAnimation(buffer, numbers, length, width);
+            drawFinalAnimation(&buffer, numbers, length, width);
         }
     }
     

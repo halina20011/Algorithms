@@ -1,11 +1,15 @@
 #include "../draw.c"
 
-extern int ended;
+extern uint8_t *buffer;
+extern int *numbers;
+extern const unsigned int width;
+extern const int length;
+
 extern int finalAnimation;
 
 #define SELECTIONSORT {"Selection Sort", &selectionSort, &selectionSortAlg, &selectionSortInit, &selectionSortFree}
 
-void *selectionSortInit(uint8_t **buffer, int *numbers, int width){
+void *selectionSortInit(){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));
     int *minIndex = malloc(sizeof(int));
@@ -14,24 +18,20 @@ void *selectionSortInit(uint8_t **buffer, int *numbers, int width){
     *(j) = *(i) + 1;
     *(minIndex) = 0;
 
-    size_t paramSize = sizeof(uint8_t*) + sizeof(int*) * 4 + sizeof(int);
-    printf("Param size: %zu\n", paramSize);
+    size_t paramSize = sizeof(int*) * 3;
 
     void *param = malloc(paramSize);
-    *((uint8_t***) (param)) = buffer;
-    *((int**) (param + sizeof(uint8_t*))) = numbers;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1)) = i;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2)) = j;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3)) = minIndex;
-    *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 4)) = width;
+    *((int**) (param + sizeof(int*) * 0)) = i;
+    *((int**) (param + sizeof(int*) * 1)) = j;
+    *((int**) (param + sizeof(int*) * 2)) = minIndex;
 
     return param;
 }
 
 int *selectionSortFree(void *param){
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *j          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *minIndex   = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
+    int *i          = *((int**) (param + sizeof(int*) * 0));
+    int *j          = *((int**) (param + sizeof(int*) * 1));
+    int *minIndex   = *((int**) (param + sizeof(int*) * 2));
     
     free(i);
     free(j);
@@ -65,18 +65,13 @@ int selectionSortAlg(int *numbers, int length){
 }
 
 Uint32 selectionSort(Uint32 interval, void *param){
-    uint8_t **buffer = *((uint8_t***) param);
-    int *numbers    = *((int**) (param + sizeof(uint8_t*)));
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *j          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int *minIndex   = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 3));
-    int width       = *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 4));
-
-    int length = WINDOWWIDTH / width;
+    int *i          = *((int**) (param + sizeof(int*) * 0));
+    int *j          = *((int**) (param + sizeof(int*) * 1));
+    int *minIndex   = *((int**) (param + sizeof(int*) * 2));
    
     // If it is not sorted procede
     if(*(i) < length){
-        drawNumbers(buffer, numbers, length, width, *(i), *(j));
+        drawNumbers(&buffer, numbers, length, width, *(i), *(j));
 
         // If there are still some items that werent schecked in second foor lop procede
         if(*(j) < length){
@@ -101,7 +96,7 @@ Uint32 selectionSort(Uint32 interval, void *param){
     }
     else{
         if(indexAnimation++ < length){
-            drawFinalAnimation(buffer, numbers, length, width);
+            drawFinalAnimation(&buffer, numbers, length, width);
         }
     }
 

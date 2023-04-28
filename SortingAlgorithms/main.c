@@ -15,13 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_render.h>
-
-// #define CAPTURE_ON true
-#include "../pixel.c"
-#include "../pngWrapper.c"
-
+#include <stdio.h>
+#include <stdbool.h>
 // For time() and clock()
 #include <time.h>
 // For usleep()
@@ -30,15 +25,23 @@
 #include <inttypes.h>
 #include <math.h>
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_render.h>
+
+// #define CAPTURE_ON true
+#include "../pixel.c"
+#include "../pngWrapper.c"
+#include "func.h"
+
 // Include all Sorting Algorithms 
-#include "Algorithms/bubbleSort.c"
-#include "Algorithms/selectionSort.c"
-#include "Algorithms/bogosort.c"
-#include "Algorithms/insertionSort.c"
-#include "Algorithms/gnomeSort.c"
-#include "Algorithms/oddevenSort.c"
-#include "Algorithms/stoogeSort.c"
-#include "Algorithms/radixSort.c"
+#include "Algorithms/bubbleSort.h"
+#include "Algorithms/selectionSort.h"
+#include "Algorithms/bogosort.h"
+#include "Algorithms/insertionSort.h"
+#include "Algorithms/gnomeSort.h"
+#include "Algorithms/oddevenSort.h"
+#include "Algorithms/stoogeSort.h"
+#include "Algorithms/radixSort.h"
 #include "Algorithms/cocktailSort.h"
 
 #define WINDOW_WIDTH 800
@@ -51,18 +54,18 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Event event;
 
+uint8_t *buffer = NULL;
+int *numbers = NULL;
+
+const unsigned int width = 10;
+const int length = WINDOW_WIDTH / width;
+const float increase = (float)WINDOW_HEIGHT / (float)length;
+
 int capture = 0;
 // int capture = 2;
 uint16_t captureIndex = 0;
 
-const float frameRateTable[8] = {1, 2, 5, 10, 50, 100, 250, 500};
-const short int frameRateMaxIndex = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
-unsigned short frameRateIndex = 5;
-
-#define frameRate  ((float)frameRateTable[frameRateIndex])
-#define frameDelay ((Uint32)1000 / (Uint32)frameRate)
-
-int ended = 0;
+bool ended = 0;
 int indexAnimation = 0;
 
 typedef struct Algorithm{
@@ -77,34 +80,12 @@ Algorithm algorithms[] = {BUBBLESORT, SELECTIONSORT, BOGOSORT, INSERTIONSORT, GN
 
 size_t sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
 
-void fillArray(int *array, int length, float increase){
-    for(int i = 0; i < length; i++){
-        *(array + i) = (i + 1) * increase;
-    }
-}
+const float frameRateTable[8] = {1, 2, 5, 10, 50, 100, 250, 500};
+const short int frameRateMaxIndex = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
+unsigned short frameRateIndex = 5;
 
-void shuffle(int *array, int length){
-    unsigned seed = time(NULL);
-    srand(seed);
-
-    for(int i = 0; i < length; i++){
-        int newIndex = rand() % length;
-        if(i != newIndex){
-            int temp = array[newIndex];
-            // printf("Temp %d\n", temp);
-            array[newIndex] = array[i];
-            array[i] = temp;
-        }
-    }
-}
-
-void printArray(int *array, int length){
-    for(int i = 0; i < length; i++){
-        printf("%d ", array[i]);
-    }
-
-    printf("\n");
-}
+#define frameRate  ((float)frameRateTable[frameRateIndex])
+#define frameDelay ((Uint32)1000 / (Uint32)frameRate)
 
 void showOptions(){
     printf("Please select correct algorithm to run\n");
@@ -165,25 +146,24 @@ int main(int argc, char **argv){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     
-    uint8_t *buffer = NULL;
     int r = newPixelBuffer(&buffer);
     if(r){
         printf("Error allocating memory for pixel buffer\n");
         return 1;
     }
 
-    const unsigned int width = 10;
-    int length = WINDOW_WIDTH / width;
-    float increase = (float)WINDOW_HEIGHT / (float)length;
-    printf("Lengtht: %d increase: %f\n", length, increase);
-    int *numbers = malloc(sizeof(int) * length);
-    
+    numbers = malloc(sizeof(int) * length);
+    if(numbers == NULL){
+        printf("Error allocating memory for numbers buffer\n");
+        return 1;
+    }
+
     fillArray(numbers, length, increase);
     shuffle(numbers, length);
 
-    void *(*initFunction)(uint8_t**, int*, int) = algorithms[runAlgorithmIndex].init;
+    void *(*initFunction)() = algorithms[runAlgorithmIndex].init;
     void *(*freeFunction)(void *param) = algorithms[runAlgorithmIndex].free;
-    void *param = (*initFunction)(&buffer, numbers, width);
+    void *param = (*initFunction)();
     const void *func = algorithms[runAlgorithmIndex].algorithm;
 
     // int *numbersCopy = malloc(sizeof(int) * length);

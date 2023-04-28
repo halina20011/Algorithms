@@ -1,34 +1,34 @@
 #include "../draw.c"
+#include "../func.h"
 
-extern int ended;
+extern uint8_t *buffer;
+extern int *numbers;
+extern const unsigned int width;
+extern const int length;
+
 extern int indexAnimation;
-void printArray(int *, int);
 
 #define INSERTIONSORT {"Insertion Sort", &insertionSort, &insertionSortAlg, &insertionSortInit, &insertionSortFree}
 
-void *insertionSortInit(uint8_t **buffer, int *numbers, int width){
+void *insertionSortInit(){
     int *i = malloc(sizeof(int));
     int *j = malloc(sizeof(int));
     
     *(i) = 1;
     *(j) = *(i) - 1;
 
-    size_t paramSize = sizeof(uint8_t*) + sizeof(int*) * 3 + sizeof(int);
-    printf("Param size: %zu\n", paramSize);
+    size_t paramSize = sizeof(int*) * 2;
 
     void *param = malloc(paramSize);
-    *((uint8_t***) (param)) = buffer;
-    *((int**) (param + sizeof(uint8_t*))) = numbers;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1)) = i;
-    *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2)) = j;
-    *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 3)) = width;
+    *((int**) (param + sizeof(int*) * 0)) = i;
+    *((int**) (param + sizeof(int*) * 1)) = j;
 
     return param;
 }
 
 int insertionSortFree(void *param){
-    int *i  = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *j  = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
+    int *i  = *((int**) (param + sizeof(int*) * 0));
+    int *j  = *((int**) (param + sizeof(int*) * 1));
     
     free(i);
     free(j);
@@ -57,17 +57,12 @@ int insertionSortAlg(int *numbers, int length){
 }
 
 Uint32 insertionSort(Uint32 interval, void *param){
-    uint8_t **buffer = *((uint8_t***) param);
-    int *numbers    = *((int**) (param + sizeof(uint8_t*)));
-    int *i          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 1));
-    int *j          = *((int**) (param + sizeof(uint8_t*) + sizeof(int*) * 2));
-    int width       = *((int*)  (param + sizeof(uint8_t*) + sizeof(int*) * 3));
-
-    int length = WINDOWWIDTH / width;
+    int *i          = *((int**) (param + sizeof(int*) * 0));
+    int *j          = *((int**) (param + sizeof(int*) * 1));
 
     // If array isn't yet sorted
     if(*(i) < length){
-        drawNumbers(buffer, numbers, length, width, *(j), *(j) + 1);
+        drawNumbers(&buffer, numbers, length, width, *(j), *(j) + 1);
         
         if(*(j) < 0){
             *(i) += 1;
@@ -87,7 +82,7 @@ Uint32 insertionSort(Uint32 interval, void *param){
     }
     else{
         if(indexAnimation++ < length){
-            drawFinalAnimation(buffer, numbers, length, width);
+            drawFinalAnimation(&buffer, numbers, length, width);
         }
     }
     
