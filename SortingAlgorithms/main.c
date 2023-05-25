@@ -33,17 +33,6 @@
 #include "../pngWrapper.c"
 #include "func.h"
 
-// Include all Sorting Algorithms 
-#include "Algorithms/bubbleSort.h"
-#include "Algorithms/selectionSort.h"
-#include "Algorithms/bogosort.h"
-#include "Algorithms/insertionSort.h"
-#include "Algorithms/gnomeSort.h"
-#include "Algorithms/oddevenSort.h"
-#include "Algorithms/stoogeSort.h"
-#include "Algorithms/radixSort.h"
-#include "Algorithms/cocktailSort.h"
-
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
@@ -57,9 +46,9 @@ SDL_Event event;
 uint8_t *buffer = NULL;
 int *numbers = NULL;
 
-const unsigned int width = 10;
-const int length = WINDOW_WIDTH / width;
-const float increase = (float)WINDOW_HEIGHT / (float)length;
+#define numbersWidth 10
+#define numbersSize (WINDOW_WIDTH / numbersWidth)
+const float increase = (float)WINDOW_HEIGHT / (float)numbersSize;
 
 int capture = 0;
 // int capture = 2;
@@ -68,24 +57,90 @@ uint16_t captureIndex = 0;
 bool ended = 0;
 int indexAnimation = 0;
 
-typedef struct Algorithm{
+struct Algorithm{
     const char *name;
     const void *algorithm;
-    const void *testAlgorithm;
-    const void *init;
-    const void *free;
-} Algorithm;
-
-Algorithm algorithms[] = {BUBBLESORT, SELECTIONSORT, BOGOSORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, RADIXSORT, COCKTAILSORT};
-
-size_t sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
+};
 
 const float frameRateTable[8] = {1, 2, 5, 10, 50, 100, 250, 500};
 const short int frameRateMaxIndex = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
 unsigned short frameRateIndex = 5;
 
+bool process(){
+    while(SDL_PollEvent(&event)){
+        if(event.type == SDL_KEYDOWN){
+            SDL_Keycode key = event.key.keysym.sym;
+            if(key == SDLK_q || key == SDLK_ESCAPE){
+                return false;
+            }
+        }
+        else if(event.type == SDL_KEYUP){
+            SDL_Keycode key = event.key.keysym.sym;
+            
+            if(key == SDLK_RETURN){
+                if(frameRateIndex != 6){
+                    frameRateIndex = 6;
+                }
+            }
+            else if(key == SDLK_s || key == SDLK_DOWN){
+                if(0 < frameRateIndex){
+                    frameRateIndex--;
+                }
+            }
+            else if(key == SDLK_w || key == SDLK_UP){
+                if(frameRateIndex < frameRateMaxIndex - 1){
+                    frameRateIndex++;
+                }
+            }
+        }
+        else if(event.type == SDL_QUIT){
+            return false;
+        }
+    }
+
+    return true;
+}
+
 #define frameRate  ((float)frameRateTable[frameRateIndex])
 #define frameDelay ((Uint32)1000 / (Uint32)frameRate)
+
+void wait(){
+    SDL_Delay(frameDelay);
+}
+
+#define SHOW \
+    do{ \
+        bool result = (*process)(); \
+        if(result == 0){ \
+            SDL_DestroyRenderer(renderer); \
+            SDL_DestroyWindow(window); \
+            SDL_Quit(); \
+            exit(0); \
+        } \
+    } while(0)
+
+#define WAIT \
+    do{ \
+        wait(); \
+    } while(0)
+
+// Include all Sorting Algorithms 
+#include "Algorithms/bubbleSort.h"
+// #include "Algorithms/selectionSort.h"
+// #include "Algorithms/bogosort.h"
+#include "Algorithms/insertionSort.h"
+#include "Algorithms/gnomeSort.h"
+#include "Algorithms/oddevenSort.h"
+#include "Algorithms/stoogeSort.h"
+// #include "Algorithms/radixSort.h"
+#include "Algorithms/cocktailSort.h"
+
+struct Algorithm algorithms[] = {
+    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, 
+    //SELECTIONSORT, BOGOSORT, RADIXSORT//, 
+};
+
+size_t sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
 
 void showOptions(){
     printf("Please select correct algorithm to run\n");
@@ -113,7 +168,7 @@ int main(int argc, char **argv){
     // runAlgorithmIndex = atoi(argv[1]);
     int s = sscanf(indexArg, "%i", &runAlgorithmIndex);
 
-    // Input is not a number
+    // input is not a number
     if(s == 0){
         runAlgorithmIndex = -1;
     }
@@ -152,87 +207,33 @@ int main(int argc, char **argv){
         return 1;
     }
 
-    numbers = malloc(sizeof(int) * length);
+    numbers = malloc(sizeof(int) * numbersSize);
     if(numbers == NULL){
         printf("Error allocating memory for numbers buffer\n");
         return 1;
     }
 
-    fillArray(numbers, length, increase);
-    shuffle(numbers, length);
+    fillArray(numbers, numbersSize, increase);
+    shuffle(numbers, numbersSize);
 
-    void *(*initFunction)() = algorithms[runAlgorithmIndex].init;
-    void *(*freeFunction)(void *param) = algorithms[runAlgorithmIndex].free;
-    void *param = (*initFunction)();
-    const void *func = algorithms[runAlgorithmIndex].algorithm;
+    const void (*algorithm)(uint8_t **buffer, int *numbers) = algorithms[runAlgorithmIndex].algorithm;
 
-    // int *numbersCopy = malloc(sizeof(int) * length);
-    // memcpy(numbersCopy, numbers, sizeof(int) * length);
-    // void *(*testAlgorithm)(int*, int) = algorithms[runAlgorithmIndex].testAlgorithm;
-    // (*testAlgorithm)(numbersCopy, length);
+    // int *numbersCopy = malloc(sizeof(int) * numbersSize);
+    // memcpy(numbersCopy, numbers, sizeof(int) * numbersSize);
+    // algorithm(NULL, numbersCopy);
+    // printArray(numbersCopy, );
     // free(numbersCopy);
-
-    // Schedule the first frame
-    SDL_TimerID timer = SDL_AddTimer(frameDelay, func, param);
     
-    int run = 1;
-    while(run){
-        while(SDL_PollEvent(&event)){
-            if(event.type == SDL_KEYDOWN){
-                SDL_Keycode key = event.key.keysym.sym;
-                if(key == SDLK_q || key == SDLK_ESCAPE){
-                    run = 0;
-                }
-            }
-            else if(event.type == SDL_KEYUP){
-                SDL_Keycode key = event.key.keysym.sym;
-                
-                int update = 0;
-                if(key == SDLK_RETURN){
-                    if(frameRateIndex != 6){
-                        frameRateIndex = 6;
-                        update = 1;
-                    }
-                }
-                else if(key == SDLK_s || key == SDLK_DOWN){
-                    if(0 < frameRateIndex){
-                        frameRateIndex--;
-                        update = 1;
-                    }
-                }
-                else if(key == SDLK_w || key == SDLK_UP){
-                    if(frameRateIndex < frameRateMaxIndex - 1){
-                        frameRateIndex++;
-                        update = 1;
-                    }
-                }
+    algorithm(&buffer, numbers);
 
-                if(update == 1){
-                    SDL_RemoveTimer(timer);
-                    timer = SDL_AddTimer(frameDelay, func, param);
+    drawFinalAnimation(&buffer, numbers, numbersWidth, numbersSize);
 
-                    // printf("Frame rate: %.2f\n", frameRate);
-                    // printf("Frame delay: %"PRIu32"\n", frameDelay);
-                }
-            }
-            else if(event.type == SDL_QUIT){
-                run = 0;
-            }
-        }
-    }
-
-    printf("Timer\n");
-    SDL_RemoveTimer(timer);
-    // Wait for timer to execute last time
-    usleep(frameDelay * 1000 * 2);
+    // wait for user exit
+    while(process()){}
 
     printf("Renderer and window\n");
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    
-    printf("Free\n");
-    free(numbers);
-    (*freeFunction)(param);
 
     SDL_Quit();
 
