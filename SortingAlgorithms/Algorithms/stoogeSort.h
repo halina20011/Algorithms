@@ -33,26 +33,31 @@ void stoogeSort(uint8_t **buffer, int *numbers){
 
         if(numbers[j] < numbers[i]){
             swap(&numbers[j], &numbers[i]);
-            if(buffer != NULL){
-                SHOW;
-                drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, j);
-                wait();
-            }
+        }
+        if(buffer != NULL){
+            SHOW;
+            drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, j);
+            wait();
         }
     }
 
     free(stack);
 }
 
-void stoogeSortAlgRecursive(int *numbers, int length, int i){
+void stoogeSort2(uint8_t **buffer, int *numbers, int length, int i){
     if(numbers[length - 1] < numbers[i]){
         swap(&numbers[i], &numbers[length - 1]);
+    }
+    if(buffer != NULL){
+        SHOW;
+        drawNumbers(buffer, numbers, numbersSize, numbersWidth, i - 1, i);
+        wait();
     }
 
     if(2 < length - i){
         int oneThird = (int)((length - i) / 3);
-        stoogeSortAlgRecursive(numbers, length - oneThird, i);
-        stoogeSortAlgRecursive(numbers, length, i + oneThird);
-        stoogeSortAlgRecursive(numbers, length - oneThird, i);
+        stoogeSort2(buffer, numbers, length - oneThird, i);
+        stoogeSort2(buffer, numbers, length, i + oneThird);
+        stoogeSort2(buffer, numbers, length - oneThird, i);
     }
 }

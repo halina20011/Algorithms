@@ -1,7 +1,9 @@
+toggle animation pause/play
+show swaps with different color
+
 Binary Radix Sort
 Bucket Sort
 Slow Sort
 Counting sort
-Cocktail sort
 Bitonic sorter
 Batcher odd–even mergesort

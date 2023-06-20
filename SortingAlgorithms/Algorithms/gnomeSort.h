@@ -7,22 +7,17 @@ void gnomeSort(uint8_t **buffer, int *numbers){
     int i = 0;
 
     while(i < numbersSize){
-        if(i == -1){
-            i += 1;
+        if(i == 0 || numbers[i - 1] <= numbers[i]){
+            i++;
         }
-
-        // correct order => one number forward
-        if(numbers[i] < numbers[i + 1]){
-            i += 1;
+        else{            
+            swap(&numbers[i], &numbers[i - 1]);
+            i--;
         }
-        else{ // swap them and go one step backwards
-            swap(&numbers[i], &numbers[i + 1]);
-            i -= 1;
-            if(buffer != NULL){
-                SHOW;
-                drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, i + 1);
-                wait();
-            }
+        if(buffer != NULL){
+            SHOW;
+            drawNumbers(buffer, numbers, numbersSize, numbersWidth, i - 1, i);
+            wait();
         }
     }
 }

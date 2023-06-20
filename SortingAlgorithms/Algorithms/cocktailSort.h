@@ -16,30 +16,30 @@ void cocktailSort(uint8_t **buffer, int *numbers){
             if(numbers[i + 1] < numbers[i]){
                 swap(&numbers[i], &numbers[i + 1]);
                 sorted = false;
-                if(buffer != NULL){
-                    SHOW;
-                    drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, i + 1);
-                    wait();
-                }
+            }
+            if(buffer != NULL){
+                SHOW;
+                drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, i + 1);
+                wait();
             }
 		}
 		end--;
 
-		if(sorted)
+		if(sorted){
             break;
+        }
 
 		for(int i = end; i > start; i--){
             if(numbers[i] < numbers[i - 1]){
                 swap(&numbers[i], &numbers[i - 1]);
                 sorted = false;
-                if(buffer != NULL){
-                    SHOW;
-                    drawNumbers(buffer, numbers, numbersSize, numbersWidth, i - 1, i);
-                    wait();
-                }
+            }
+            if(buffer != NULL){
+                SHOW;
+                drawNumbers(buffer, numbers, numbersSize, numbersWidth, i - 1, i);
+                wait();
             }
 		}
-        
 		start++;
 	}
 }

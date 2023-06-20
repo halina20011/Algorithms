@@ -11,28 +11,31 @@ void oddevenSort(uint8_t **buffer, int *numbers){
     while(sorted == false){
         sorted = true;
 
-        for(int i = 0; i < numbersSize - 1; i += 2){
+        // odd part
+        for(int i = 1; i < numbersSize - 1; i += 2){
             if(numbers[i + 1] < numbers[i]){
                 swap(&numbers[i], &numbers[i + 1]);
                 sorted = false;
-                if(buffer != NULL){
-                    SHOW;
-                    drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, i + 1);
-                    wait();
-                }
+            }
+            if(buffer != NULL){
+                SHOW;
+                drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, i + 1);
+                wait();
             }
         }
 
-        for(int i = 1; i < numbersSize - 2; i += 2){
+        // even part
+        for(int i = 0; i < numbersSize; i += 2){
             if(numbers[i + 1] < numbers[i]){
                 swap(&numbers[i], &numbers[i + 1]);
                 sorted = false;
-                if(buffer != NULL){
-                    SHOW;
-                    drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, i + 1);
-                    wait();
-                }
+            }
+            if(buffer != NULL){
+                SHOW;
+                drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, i + 1);
+                wait();
             }
         }
+
     }
 }

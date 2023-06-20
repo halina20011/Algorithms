@@ -17,11 +17,11 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-// For time() and clock()
+// for time() and clock()
 #include <time.h>
-// For usleep()
+// for usleep()
 #include <unistd.h>
-// For PRIu32 macro
+// for PRIu32 macro
 #include <inttypes.h>
 #include <math.h>
 
@@ -124,20 +124,19 @@ void wait(){
         wait(); \
     } while(0)
 
-// Include all Sorting Algorithms 
+// include all Sorting Algorithms 
 #include "Algorithms/bubbleSort.h"
-// #include "Algorithms/selectionSort.h"
-// #include "Algorithms/bogosort.h"
+#include "Algorithms/selectionSort.h"
+#include "Algorithms/bogosort.h"
 #include "Algorithms/insertionSort.h"
 #include "Algorithms/gnomeSort.h"
 #include "Algorithms/oddevenSort.h"
 #include "Algorithms/stoogeSort.h"
-// #include "Algorithms/radixSort.h"
+#include "Algorithms/radixSort.h"
 #include "Algorithms/cocktailSort.h"
 
 struct Algorithm algorithms[] = {
-    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, 
-    //SELECTIONSORT, BOGOSORT, RADIXSORT//, 
+    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT
 };
 
 size_t sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
@@ -164,11 +163,11 @@ int main(int argc, char **argv){
     indexArg = (argc == 3) ? argv[2] : argv[1];
     flagsArg = (argc == 3) ? argv[1] : NULL;
     
-    // Convert
+    // parse the user input
     // runAlgorithmIndex = atoi(argv[1]);
     int s = sscanf(indexArg, "%i", &runAlgorithmIndex);
 
-    // input is not a number
+    // if input is not a number
     if(s == 0){
         runAlgorithmIndex = -1;
     }
@@ -189,12 +188,12 @@ int main(int argc, char **argv){
 
     printf("Algorithm: \"%s\"\n", algorithms[runAlgorithmIndex].name);
     
-    // Initialize SDL2
+    // initialize SDL2
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
         printf("Error initializing SDL: %s\n", SDL_GetError());
     }
 
-    // Create a window and renderer
+    // create a window and renderer
     window = SDL_CreateWindow("Sorting Algorithms", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -228,7 +227,7 @@ int main(int argc, char **argv){
 
     drawFinalAnimation(&buffer, numbers, numbersWidth, numbersSize);
 
-    // wait for user exit
+    // wait for user to exit
     while(process()){}
 
     printf("Renderer and window\n");

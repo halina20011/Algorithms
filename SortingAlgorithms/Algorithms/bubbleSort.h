@@ -13,11 +13,11 @@ void bubbleSort(uint8_t **buffer, int *numbers){
             if(numbers[j + 1] < numbers[j]){
                 swap(&numbers[j], &numbers[j + 1]);
                 isSorted = false;
-                if(buffer != NULL){
-                    SHOW;
-                    drawNumbers(buffer, numbers, numbersSize, numbersWidth, j, j + 1);
-                    wait();
-                }
+            }
+            if(buffer != NULL){
+                SHOW;
+                drawNumbers(buffer, numbers, numbersSize, numbersWidth, j, j + 1);
+                wait();
             }
         }
 
