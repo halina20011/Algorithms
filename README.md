@@ -1,5 +1,5 @@
 # Math Art
-Repo in which you can find the art of mathematics </br>
+repository in which you can find "the art of algorithms" </br>
 
 ## Marching squares
 <img src="/Images/marchingSquares.png" alt="preview" width="300" style="height:auto;">
@@ -19,6 +19,8 @@ Gnome Sort </br>
 Odd-even Sort </br>
 Stooge Sort </br>
 Radix Sort </br>
+Cocktail Sort </br>
+Heapsort </br>
 <img src="/Images/bubbleSort.png" alt="preview" width="300" style="height:auto;">
 
 ## SDL2

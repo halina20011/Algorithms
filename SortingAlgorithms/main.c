@@ -17,8 +17,6 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-// for time() and clock()
-#include <time.h>
 // for usleep()
 #include <unistd.h>
 // for PRIu32 macro
@@ -134,9 +132,10 @@ void wait(){
 #include "Algorithms/stoogeSort.h"
 #include "Algorithms/radixSort.h"
 #include "Algorithms/cocktailSort.h"
+#include "Algorithms/heapsort.h"
 
 struct Algorithm algorithms[] = {
-    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT
+    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT, HEAPSORT
 };
 
 size_t sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);

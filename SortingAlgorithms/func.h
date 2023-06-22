@@ -2,10 +2,12 @@
 #define FUNC
 
 #include <stdio.h>
+// for time
+#include <time.h>
 
 void fillArray(int *array, int length, float increase){
     for(int i = 0; i < length; i++){
-        *(array + i) = (i + 1) * increase;
+        array[i] = (i + 1) * increase;
     }
 }
 
