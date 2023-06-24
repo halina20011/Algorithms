@@ -1,13 +1,4 @@
-#include "../draw.c"
 #include "../func.h"
-
-extern uint8_t *buffer;
-extern int *numbers;
-extern const unsigned int width;
-extern const int length;
-
-extern bool ended;
-extern int indexAnimation;
 
 #define BOGOSORT {"Bogosort", &bogosort}
 

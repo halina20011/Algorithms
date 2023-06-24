@@ -1,5 +1,6 @@
 #include <stdbool.h>
-#include "../draw.c"
+
+#include "../func.h"
 
 #define HEAPSORT {"Heapsort", &heapsort}
 
@@ -42,9 +43,5 @@ void heapsort(uint8_t **buffer, int *numbers){
         // move the max number to the end and decrease the size of the heap
         swap(numbers + 0, numbers + --heapSize);
         maxHeapify(buffer, numbers, heapSize, 0);
-    }
-
-    if(buffer != NULL){
-        drawNumbers(buffer, numbers, numbersSize, numbersWidth, -1, -1);
     }
 }

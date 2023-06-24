@@ -1,6 +1,5 @@
 #include <math.h>
 
-#include "../draw.c"
 #include "../func.h"
 
 #define STOOGESORT {"Stooge Sort", &stoogeSort}

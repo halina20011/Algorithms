@@ -1,8 +1,6 @@
 #include <limits.h>
 
-#include "../draw.c"
 #include "../func.h"
-
 #include "../singleLinkedList.h"
 
 #define RADIXSORT {"Radix Sort", &radixSort}

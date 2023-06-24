@@ -1,6 +1,5 @@
 #include <stdbool.h>
 
-#include "../draw.c"
 #include "../func.h"
 
 #define ODDEVENSORT {"Odd-even Sort", &oddevenSort}

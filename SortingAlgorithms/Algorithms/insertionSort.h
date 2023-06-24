@@ -1,4 +1,3 @@
-#include "../draw.c"
 #include "../func.h"
 
 #define INSERTIONSORT {"Insertion Sort", &insertionSort}

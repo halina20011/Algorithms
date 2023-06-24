@@ -1,5 +1,20 @@
-# Math Art
-repository in which you can find "the art of algorithms" </br>
+# Algorithms
+repository with implementations and visualization of algorithms </br>
+
+## Sorting Algorithms
+<img src="/Images/sortingAlgorithms.png" alt="preview" width="300" style="height:auto;">
+
+Bubble Sort </br>
+Selection Sort </br>
+Bogosort </br>
+Insertion Sort </br>
+Gnome Sort </br>
+Odd-even Sort </br>
+Stooge Sort </br>
+Radix Sort </br>
+Cocktail Sort </br>
+Heapsort </br>
+Merge Sort </br>
 
 ## Marching squares
 <img src="/Images/marchingSquares.png" alt="preview" width="300" style="height:auto;">
@@ -9,19 +24,6 @@ repository in which you can find "the art of algorithms" </br>
 
 ## Tricorn
 <img src="/Images/tricorn.png" alt="preview" width="300" style="height:auto;">
-
-## Sorting Algorithms
-Bubble Sort </br>
-Selection Sort </br>
-Bogossort </br>
-Insertion Sort </br>
-Gnome Sort </br>
-Odd-even Sort </br>
-Stooge Sort </br>
-Radix Sort </br>
-Cocktail Sort </br>
-Heapsort </br>
-<img src="/Images/bubbleSort.png" alt="preview" width="300" style="height:auto;">
 
 ## SDL2
 `yay -S sdl2` </br>

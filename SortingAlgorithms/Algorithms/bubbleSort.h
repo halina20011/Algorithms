@@ -1,5 +1,6 @@
 #include <stdbool.h>
-#include "../draw.c"
+
+#include "../func.h"
 
 #define BUBBLESORT {"Bubble Sort", &bubbleSort}
 

@@ -1,4 +1,5 @@
 // gcc main.c $(sdl2-config --cflags --libs) -lm -lpng -o Build/main && ./Build/main [indexAnimation]
+// ./build.sh && ./Build/main [indexAnimation]
 
 // Copyright (C) 2023  halina20011
 //
@@ -29,7 +30,6 @@
 // #define CAPTURE_ON true
 #include "../pixel.c"
 #include "../pngWrapper.c"
-#include "func.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -122,6 +122,8 @@ void wait(){
         wait(); \
     } while(0)
 
+#include "func.h"
+
 // include all Sorting Algorithms 
 #include "Algorithms/bubbleSort.h"
 #include "Algorithms/selectionSort.h"
@@ -133,9 +135,10 @@ void wait(){
 #include "Algorithms/radixSort.h"
 #include "Algorithms/cocktailSort.h"
 #include "Algorithms/heapsort.h"
+#include "Algorithms/mergeSort.h"
 
 struct Algorithm algorithms[] = {
-    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT, HEAPSORT
+    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE
 };
 
 size_t sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
