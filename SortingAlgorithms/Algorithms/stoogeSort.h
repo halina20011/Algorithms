@@ -4,7 +4,7 @@
 
 #define STOOGESORT {"Stooge Sort", &stoogeSort}
 
-void stoogeSort(uint8_t **buffer, int *numbers){
+void stoogeSort(uint8_t **buffer, int *numbers, int numbersSize){
     int i = 0;
     int j = numbersSize - 1;
     int pos = 1;
@@ -35,7 +35,7 @@ void stoogeSort(uint8_t **buffer, int *numbers){
         }
         if(buffer != NULL){
             SHOW;
-            drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, j);
+            drawNumbers(i, j);
             wait();
         }
     }
@@ -43,20 +43,20 @@ void stoogeSort(uint8_t **buffer, int *numbers){
     free(stack);
 }
 
-void stoogeSort2(uint8_t **buffer, int *numbers, int length, int i){
-    if(numbers[length - 1] < numbers[i]){
-        swap(&numbers[i], &numbers[length - 1]);
+void stoogeSort2(uint8_t **buffer, int *numbers, int numbersSize, int i){
+    if(numbers[numbersSize - 1] < numbers[i]){
+        swap(&numbers[i], &numbers[numbersSize - 1]);
     }
     if(buffer != NULL){
         SHOW;
-        drawNumbers(buffer, numbers, numbersSize, numbersWidth, i - 1, i);
+        drawNumbers(i - 1, i);
         wait();
     }
 
-    if(2 < length - i){
-        int oneThird = (int)((length - i) / 3);
-        stoogeSort2(buffer, numbers, length - oneThird, i);
-        stoogeSort2(buffer, numbers, length, i + oneThird);
-        stoogeSort2(buffer, numbers, length - oneThird, i);
+    if(2 < numbersSize - i){
+        int oneThird = (int)((numbersSize - i) / 3);
+        stoogeSort2(buffer, numbers, numbersSize - oneThird, i);
+        stoogeSort2(buffer, numbers, numbersSize, i + oneThird);
+        stoogeSort2(buffer, numbers, numbersSize - oneThird, i);
     }
 }

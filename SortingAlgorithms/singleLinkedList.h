@@ -39,36 +39,27 @@ void printNodes(struct Node *firstNode){
     }
 }
 
-struct Node *add(struct Node *head, int data){
-    struct Node *current = head;
-    while(current->next != NULL){
-        current = current->next;
+void add(struct Node **head, struct Node **tail, int data){
+    struct Node *new = malloc(sizeof(struct Node));
+    new->data = data;
+    new->next = NULL;
+
+    if(*head == NULL){
+        *head = new;
+        *tail = new;
     }
-
-    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
-    if(newNode == NULL){
-        return NULL;
+    else{
+        (*tail)->next = new;
+        *tail = new;
     }
-
-    newNode->data = data;
-    newNode->next = NULL;
-
-    current->next = newNode;
-
-    return newNode;
 }
 
-struct Node *insert(struct Node **head, int data){
-    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
-    if(newNode == NULL){
-        return NULL;
-    }
-    newNode->next = *(head);
-    newNode->data = data;
+void insert(struct Node **head, int data){
+    struct Node *new = malloc(sizeof(struct Node));
+    new->next = *head;
+    new->data = data;
 
-    *(head) = newNode;
-
-    return newNode;
+    *head = new;
 }
 
 int delete(struct Node **head, int index){
@@ -89,6 +80,19 @@ int delete(struct Node **head, int index){
     }
 
     return data;
+}
+
+int deleteFirst(struct Node **head){
+    if(*head == NULL){
+        return INT_MIN;
+    }
+
+    struct Node *temp = *head;
+    *head = (*head)->next;
+
+    int tempVal = temp->data;
+    free(temp);
+    return tempVal;
 }
 
 #endif

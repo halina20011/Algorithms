@@ -41,12 +41,14 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Event event;
 
+int *availableSizes = NULL;
+int availableSizesSize;
+
 uint8_t *buffer = NULL;
 int *numbers = NULL;
+int numbersSize = -1;
 
-#define numbersWidth 10
-#define numbersSize (WINDOW_WIDTH / numbersWidth)
-const float increase = (float)WINDOW_HEIGHT / (float)numbersSize;
+int numberWidth = 0;
 
 int capture = 0;
 // int capture = 2;
@@ -141,55 +143,204 @@ struct Algorithm algorithms[] = {
     BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE
 };
 
-size_t sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
+int sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
+
+#define optionsSize 7
+
+const char options[optionsSize][2][50] = {
+    {"-h", "show this help message"},
+    {"-i", "select algorithm to run with this index"},
+    {"-s", "size of array"},
+    {"-ls", "list available sizes"},
+    {"-l", "list all available algorithms"},
+    {"-n", "custom input to sort e.g '[5,3,1,2]'"},
+    {"-N", "custom input to shuffle and then sort"}
+};
+
+void getAvailableSizes(){
+    divisotors(NULL, WINDOW_WIDTH, &availableSizesSize);
+    availableSizes = malloc(sizeof(int) * availableSizesSize);
+    divisotors(availableSizes, WINDOW_WIDTH, &availableSizesSize);
+    mergeSort(NULL, availableSizes, availableSizesSize, true);
+}
 
 void showOptions(){
-    printf("Please select correct algorithm to run\n");
-    printf("Index\t\tAlgorithm Name\n");
-    printf("   -1\t\t[Run the last algorithm]\n");
+    printf("please select correct algorithm to run\n");
+    printf("usage: [flag] [option]\n");
+    for(int i = 0; i < optionsSize; i++){
+        printf("  %s \t\t %s\n", options[i][0], options[i][1]);
+    }
+}
+
+void showAlgorithms(){
+    printf("index\t\talgorithm name\n");
+    printf("   -1\t\t[run the last algorithm]\n");
 
     for(int i = 0; i < sortingAlgorithmsLength; i++){
         printf("%5d\t\t%s\n", i, algorithms[i].name);
     }
 }
 
-int main(int argc, char **argv){
-    char *flagsArg = NULL;
-    char *indexArg = NULL;
+#include "singleLinkedList.h"
+int parseInput(char *input, int **array, int *arraySize){
+    char *iPtr = input;
 
+    int size = 0;
+    struct Node *head = NULL;
+    struct Node *tail = NULL;
+
+    int n = 0;
+    int numberToParse = false;
+    while(*iPtr != '\0'){
+        if(isdigit(*iPtr)){
+            n *= 10;
+            int d = *iPtr - '0';
+            n += d;
+            numberToParse = true;
+        }
+
+        if(!isdigit(*iPtr) || *(iPtr + 1) == '\0'){
+            if(numberToParse){
+                add(&head, &tail, n);
+                size++;
+                n = 0;
+                numberToParse = false;
+            }
+        }
+        iPtr++;
+    }
+    *array = malloc(sizeof(int) * size);
+    *arraySize = size;
+
+    for(int i = 0; head; i++){
+        (*array)[i] = deleteFirst(&head);
+    }
+    
+    if(searchInArray(availableSizes, availableSizesSize, size) == -1){
+        fprintf(stderr, "sorry but size '%i' of custom input is unvailable, run '-ls' to show all available sizes\n", size);
+        return 1;
+    }
+
+    return 0;
+}
+
+int main(int argc, char **argv){
+    bool shuffle = true;
+    bool customInput = false;
+    numbersSize = -1;
     int runAlgorithmIndex = -1;
     if(argc == 1){
         showOptions();
         return 1;
     }
-    indexArg = (argc == 3) ? argv[2] : argv[1];
-    flagsArg = (argc == 3) ? argv[1] : NULL;
     
-    // parse the user input
-    // runAlgorithmIndex = atoi(argv[1]);
-    int s = sscanf(indexArg, "%i", &runAlgorithmIndex);
+    getAvailableSizes();
 
-    // if input is not a number
-    if(s == 0){
-        runAlgorithmIndex = -1;
+    for(int i = 1; i < argc; i++){
+        char *flag = argv[i];
+        if(strcmp(flag, "-h") == 0){
+            showOptions();
+            return 0;
+        }
+        else if(strcmp(flag, "-l") == 0){
+            showAlgorithms();
+            return 0;
+        }
+        else if(strcmp(flag, "-ls") == 0){
+            printArray(availableSizes, availableSizesSize);
+            return 0;
+        }
+        else if(strcmp(flag, "-i") == 0){
+            if(argc <= i + 1){
+                fprintf(stderr, "missing option after flag '%s'\n", flag);
+                return 1;
+            }
+            if(!sscanf(argv[i + 1], "%i", &runAlgorithmIndex)){
+                fprintf(stderr, "invalid algorithm index\n");
+                return 1;
+            }
+            if(runAlgorithmIndex < -2 || sortingAlgorithmsLength <= runAlgorithmIndex){
+                fprintf(stderr, "valid range is <-1; %i)\n", sortingAlgorithmsLength);
+                return 1;
+            }
+            i++;
+        }
+        else if(strcmp(flag, "-s") == 0){
+            if(argc <= i + 1){
+                fprintf(stderr, "missing option after flag '%s'\n", flag);
+                return 1;
+            }
+            if(!sscanf(argv[i + 1], "%i", &numbersSize)){
+                fprintf(stderr, "invalid numbers size\n");
+                return 1;
+            }
+            if(searchInArray(availableSizes, availableSizesSize, numbersSize) == -1){
+                fprintf(stderr, "this size is unvailable run '-ls' to show all available sizes\n");
+                return 1;
+            }
+            i++;
+        }
+        else if(strcmp(flag, "-n") == 0){
+            if(argc <= i + 1){
+                fprintf(stderr, "missing option after flag '%s'\n", flag);
+                return 1;
+            }
+            customInput = true;
+            shuffle = false;
+            if(parseInput(argv[i + 1], &numbers, &numbersSize)){
+                fprintf(stderr, "failed parsing of the input\n");
+                return 0;
+            }
+            i++;
+        }
+        else if(strcmp(flag, "-N") == 0){
+            if(argc <= i + 1){
+                fprintf(stderr, "missing option after flag '%s'\n", flag);
+                return 1;
+            }
+            customInput = true;
+            if(parseInput(argv[i + 1], &numbers, &numbersSize)){
+                fprintf(stderr, "failed parsing of the input\n");
+                return 0;
+            }
+            i++;
+        }
     }
-    else if(runAlgorithmIndex == -1){
+    
+    if(runAlgorithmIndex == -1){
         runAlgorithmIndex = sortingAlgorithmsLength - 1;
     }
-    else if(runAlgorithmIndex < -1 || sortingAlgorithmsLength <= runAlgorithmIndex){
-        printf("Valid range is <0; %li)\n", sortingAlgorithmsLength);
-        runAlgorithmIndex = 0;
-    }
 
-    if(flagsArg != NULL){
-        if(memcmp(flagsArg, "-c", 2) == 0){
-            capture = 2;
-            printf("Capture is turned on\n");
+    if(!customInput){
+        if(numbersSize <= 0){
+            numbersSize = 100;
+        }
+        numbers = malloc(sizeof(int) * numbersSize);
+        if(numbers == NULL){
+            fprintf(stderr, "error allocating memory for numbers buffer\n");
+            return 1;
+        }
+        for(int i = 0; i < numbersSize; i++){
+            numbers[i] = i + 1;
         }
     }
 
-    printf("Algorithm: \"%s\"\n", algorithms[runAlgorithmIndex].name);
+    if(shuffle){
+        shuffleArray(numbers, numbersSize);
+    }
+
+    int max = 0;
+    for(int i = 0; i < numbersSize; i++){
+        max = (max < numbers[i]) ? numbers[i] : max;
+    }
     
+    numberWidth = WINDOW_WIDTH / numbersSize;
+
+    const double increase = (double)WINDOW_HEIGHT / (double)max;
+    fillArray(numbers, numbersSize, increase);
+
+    printf("Algorithm: \"%s\"\n", algorithms[runAlgorithmIndex].name);
+
     // initialize SDL2
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
         printf("Error initializing SDL: %s\n", SDL_GetError());
@@ -204,20 +355,11 @@ int main(int argc, char **argv){
     
     int r = newPixelBuffer(&buffer);
     if(r){
-        printf("Error allocating memory for pixel buffer\n");
+        fprintf(stderr, "Error allocating memory for pixel buffer\n");
         return 1;
     }
 
-    numbers = malloc(sizeof(int) * numbersSize);
-    if(numbers == NULL){
-        printf("Error allocating memory for numbers buffer\n");
-        return 1;
-    }
-
-    fillArray(numbers, numbersSize, increase);
-    shuffle(numbers, numbersSize);
-
-    const void (*algorithm)(uint8_t **buffer, int *numbers) = algorithms[runAlgorithmIndex].algorithm;
+    const void (*algorithm)(uint8_t **buffer, int *numbers, int numbersSize) = algorithms[runAlgorithmIndex].algorithm;
 
     // int *numbersCopy = malloc(sizeof(int) * numbersSize);
     // memcpy(numbersCopy, numbers, sizeof(int) * numbersSize);
@@ -225,14 +367,13 @@ int main(int argc, char **argv){
     // printArray(numbersCopy, );
     // free(numbersCopy);
     
-    algorithm(&buffer, numbers);
+    algorithm(&buffer, numbers, numbersSize);
 
-    drawFinalAnimation(&buffer, numbers, numbersWidth, numbersSize);
+    drawFinalAnimation(&buffer, numbers, numbersSize);
 
     // wait for user to exit
     while(process()){}
 
-    printf("Renderer and window\n");
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 

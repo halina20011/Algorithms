@@ -7,13 +7,18 @@
 
 #include "../pixel.c"
 
-void fillArray(int *array, int length, float increase){
-    for(int i = 0; i < length; i++){
-        array[i] = (i + 1) * increase;
+extern int numberWidth;
+extern uint8_t *buffer;
+extern int *numbers;
+extern int numbersSize;
+
+void fillArray(int *array, int arraySize, double increase){
+    for(int i = 0; i < arraySize; i++){
+        array[i] *= increase;
     }
 }
 
-void shuffle(int *array, int length){
+void shuffleArray(int *array, int length){
     unsigned seed = time(NULL);
     srand(seed);
 
@@ -28,47 +33,88 @@ void shuffle(int *array, int length){
     }
 }
 
+void divisotors(int *array, int number, int *size){
+    int s = 0;
+    const int sqrtN = sqrt(number);
+    for(int i = 2; i <= sqrtN; i++){
+        if(WINDOW_WIDTH % i == 0){
+            if(array){
+                array[s] = i;
+            }
+            s++;
+            if(i != sqrtN){
+                if(array){
+                    array[s] = number / i;
+                }
+                s++;
+            }
+        }
+    }
+
+    *size = s;
+}
+
+int searchInArray(int *array, int arraySize, int target){
+    int left = 0;
+    int right = arraySize;
+    while(left <= right){
+        const int m = left + (right - left) / 2;
+
+        if(array[m] == target){
+            return m;
+        }
+        else if(array[m] < target){
+            left = m + 1;
+        }
+        else{
+            right = m - 1;
+        }
+    }
+
+    return -1;
+}
+
 void swap(int *x, int *y){
     int temp = *(x);
     *(x) = *(y);
     *(y) = temp;
 }
 
-void printArray(int *array, int length){
-    for(int i = 0; i < length; i++){
+void printArray(int *array, int arraySize){
+    for(int i = 0; i < arraySize; i++){
         printf("%d ", array[i]);
     }
 
     printf("\n");
 }
 
-void drawNumbers(uint8_t **buffer, int *numbers, int length, int width, int indexItem1, int indexItem2){
+void drawNumbers(int indexItem1, int indexItem2){
     setColor(0, 0, 0, 255);
     fillBuffer(buffer);
     setColor(255, 255, 255, 255);
 
-    for(int i = 0; i < length; i++){
-        int x = i * width;
+    for(int i = 0; i < numbersSize; i++){
+        int x = i * numberWidth;
         if(indexItem1 == i || indexItem2 == i){
             setColor(255, 0, 0, 255);
-            drawRectangle(buffer, x, WINDOW_HEIGHT - numbers[i], width, numbers[i]);
+            drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
             setColor(255, 255, 255, 255);
         }
         else{
-            drawRectangle(buffer, x, WINDOW_HEIGHT - numbers[i], width, numbers[i]);
+            drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
         }
     }
 
-    update(*buffer);
+    update(buffer);
 }
 
-void drawFinalAnimation(uint8_t **buffer, int *numbers, int width, int length){
-    drawNumbers(buffer, numbers, length, width, -1, -1);
+void drawFinalAnimation(){
+    drawNumbers(-1, -1);
     setColor(0, 255, 0, 255);
-    for(int i = 0; i < length; i++){
-        int x = i * width;
-        drawRectangle(buffer, x, WINDOW_HEIGHT - numbers[i], width, numbers[i]);
-        update(*buffer);
+    for(int i = 0; i < numbersSize; i++){
+        int x = i * numberWidth;
+        drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
+        update(buffer);
         SHOW;
         wait();
     }

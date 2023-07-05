@@ -4,7 +4,7 @@
 
 #define ODDEVENSORT {"Odd-even Sort", &oddevenSort}
 
-void oddevenSort(uint8_t **buffer, int *numbers){
+void oddevenSort(uint8_t **buffer, int *numbers, int numbersSize){
     bool sorted = false;
 
     while(sorted == false){
@@ -18,7 +18,7 @@ void oddevenSort(uint8_t **buffer, int *numbers){
             }
             if(buffer != NULL){
                 SHOW;
-                drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, i + 1);
+                drawNumbers(i, i + 1);
                 wait();
             }
         }
@@ -31,7 +31,7 @@ void oddevenSort(uint8_t **buffer, int *numbers){
             }
             if(buffer != NULL){
                 SHOW;
-                drawNumbers(buffer, numbers, numbersSize, numbersWidth, i, i + 1);
+                drawNumbers(i, i + 1);
                 wait();
             }
         }

@@ -12,7 +12,7 @@ void maxHeapify(uint8_t **buffer, int *heap, int heapSize, int node){
         max = leftChild;
         if(buffer != NULL){
             SHOW;
-            drawNumbers(buffer, numbers, numbersSize, numbersWidth, node, leftChild);
+            drawNumbers(node, leftChild);
             wait();
         }
     }
@@ -20,7 +20,7 @@ void maxHeapify(uint8_t **buffer, int *heap, int heapSize, int node){
         max = rightChild;
         if(buffer != NULL){
             SHOW;
-            drawNumbers(buffer, numbers, numbersSize, numbersWidth, node, rightChild);
+            drawNumbers(node, rightChild);
             wait();
         }
     }
@@ -30,7 +30,7 @@ void maxHeapify(uint8_t **buffer, int *heap, int heapSize, int node){
     }
 }
 
-void heapsort(uint8_t **buffer, int *numbers){
+void heapsort(uint8_t **buffer, int *numbers, int numbersSize){
     int heapSize = numbersSize;
     
     // create max heap

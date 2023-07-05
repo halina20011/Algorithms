@@ -72,15 +72,15 @@ void clear(uint8_t **buffer){
     }
 }
 
-void fillBuffer(uint8_t **buffer){
+void fillBuffer(uint8_t *buffer){
     for(int y = 0; y < WINDOWHEIGHT; y++){
         for(int x = 0; x < WINDOWWIDTH; x++){
-            int i = 4 * (y * WINDOWWIDTH + x);
+            const int i = 4 * (y * WINDOWWIDTH + x);
 
-            *(*buffer + i + 0) = rgba[0];
-            *(*buffer + i + 1) = rgba[1];
-            *(*buffer + i + 2) = rgba[2];
-            *(*buffer + i + 3) = rgba[3];
+            *(buffer + i + 0) = rgba[0];
+            *(buffer + i + 1) = rgba[1];
+            *(buffer + i + 2) = rgba[2];
+            *(buffer + i + 3) = rgba[3];
         }
     }
 }
