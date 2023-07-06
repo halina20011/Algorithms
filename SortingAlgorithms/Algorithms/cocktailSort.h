@@ -4,7 +4,7 @@
 
 #define COCKTAILSORT {"Cocktail Sort", &cocktailSort}
 
-void cocktailSort(uint8_t **buffer, int *numbers, int numbersSize){
+void cocktailSort(uint8_t *buffer, int *numbers, int numbersSize){
     bool sorted = false;
     int start = 0;
 	int end = numbersSize - 1;
@@ -17,8 +17,9 @@ void cocktailSort(uint8_t **buffer, int *numbers, int numbersSize){
                 sorted = false;
             }
             if(buffer != NULL){
-                SHOW;
+                ProcessEvents()
                 drawNumbers(i, i + 1);
+                update(buffer);
                 wait();
             }
 		}
@@ -34,8 +35,9 @@ void cocktailSort(uint8_t **buffer, int *numbers, int numbersSize){
                 sorted = false;
             }
             if(buffer != NULL){
-                SHOW;
+                ProcessEvents()
                 drawNumbers(i - 1, i);
+                update(buffer);
                 wait();
             }
 		}

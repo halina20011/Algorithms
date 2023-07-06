@@ -5,15 +5,16 @@
 
 #define RADIXSORT {"Radix Sort", &radixSort}
 
-void radixSort(uint8_t **buffer, int *numbers, int numbersSize){
+void radixSort(uint8_t *buffer, int *numbers, int numbersSize){
     int minIndex = 0;
     for(int i = 0; i < numbersSize; i++){
         if(numbers[minIndex] < numbers[i]){
             minIndex = i;
         }
         if(buffer != NULL){
-            SHOW;
+            ProcessEvents()
             drawNumbers(minIndex, i);
+            update(buffer);
             wait();
         }
     }
@@ -34,8 +35,9 @@ void radixSort(uint8_t **buffer, int *numbers, int numbersSize){
             int n = ((int)(numbers[i] / d)) % 10;
             add(heads + n, tails + n, numbers[i]);
             if(buffer != NULL){
-                SHOW;
+                ProcessEvents()
                 drawNumbers(i, i);
+                update(buffer);
                 wait();
             }
         }
@@ -48,8 +50,9 @@ void radixSort(uint8_t **buffer, int *numbers, int numbersSize){
                 numbers[pIndex++] = d;
                 d = deleteFirst((heads + n));
                 if(buffer != NULL){
-                    SHOW;
+                    ProcessEvents()
                     drawNumbers(pIndex, pIndex);
+                    update(buffer);
                     wait();
                 }
             }

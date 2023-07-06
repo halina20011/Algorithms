@@ -2,9 +2,9 @@
 
 #define BOGOSORT {"Bogosort", &bogosort}
 
-void bogosort(uint8_t **buffer, int *numbers, int numbersSize){
+void bogosort(uint8_t *buffer, int *numbers, int numbersSize){
     bool sorted = false;
-    // If array isn't yet sorted
+    // if array isn't yet sorted
     while(!sorted){
         sorted = true;
         shuffleArray(numbers, numbersSize);
@@ -14,8 +14,9 @@ void bogosort(uint8_t **buffer, int *numbers, int numbersSize){
                 break;
             }
             if(buffer != NULL){
-                SHOW;
+                ProcessEvents()
                 drawNumbers(i, i + 1);
+                update(buffer);
                 wait();
             }
         }

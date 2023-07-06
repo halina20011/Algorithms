@@ -2,12 +2,13 @@
 
 #define INSERTIONSORT {"Insertion Sort", &insertionSort}
 
-void insertionSort(uint8_t **buffer, int *numbers, int numbersSize){
+void insertionSort(uint8_t *buffer, int *numbers, int numbersSize){
     for(int i = 1; i < numbersSize; i++){
         for(int j = i - 1; j >= 0; j--){
             if(buffer != NULL){
-                SHOW;
+                ProcessEvents()
                 drawNumbers(j, j + 1);
+                update(buffer);
                 wait();
             }
             if(numbers[j + 1] < numbers[j]){

@@ -104,8 +104,15 @@ void drawNumbers(int indexItem1, int indexItem2){
             drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
         }
     }
+}
 
-    update(buffer);
+void highlight(int index){
+    if(0 <= index && index < numbersSize){
+        int x = index * numberWidth;
+        setColor(255, 0, 0, 255);
+        drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[index], numberWidth, numbers[index]);
+        setColor(255, 255, 255, 255);
+    }
 }
 
 void drawFinalAnimation(){
@@ -114,8 +121,8 @@ void drawFinalAnimation(){
     for(int i = 0; i < numbersSize; i++){
         int x = i * numberWidth;
         drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
+        ProcessEvents();
         update(buffer);
-        SHOW;
         wait();
     }
     

@@ -2,7 +2,7 @@
 
 #define SELECTIONSORT {"Selection Sort", &selectionSort}
 
-void selectionSort(uint8_t **buffer, int *numbers, int numbersSize){
+void selectionSort(uint8_t *buffer, int *numbers, int numbersSize){
     int minIndex = 0;
 
     for(int i = 0; i < numbersSize - 1; i++){
@@ -12,8 +12,9 @@ void selectionSort(uint8_t **buffer, int *numbers, int numbersSize){
                 minIndex = j;
             }
             if(buffer != NULL){
-                SHOW;
+                ProcessEvents()
                 drawNumbers(j, minIndex);
+                update(buffer);
                 wait();
             }
         }

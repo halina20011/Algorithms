@@ -4,23 +4,25 @@
 
 #define HEAPSORT {"Heapsort", &heapsort}
 
-void maxHeapify(uint8_t **buffer, int *heap, int heapSize, int node){
+void maxHeapify(uint8_t *buffer, int *heap, int heapSize, int node){
     int leftChild = 2 * node + 1;
     int rightChild = 2 * node + 2;
     int max = node;
     if(leftChild < heapSize && heap[node] < heap[leftChild]){
         max = leftChild;
         if(buffer != NULL){
-            SHOW;
+            ProcessEvents()
             drawNumbers(node, leftChild);
+            update(buffer);
             wait();
         }
     }
-    if(rightChild < heapSize & heap[max] < heap[rightChild]){
+    if(rightChild < heapSize && heap[max] < heap[rightChild]){
         max = rightChild;
         if(buffer != NULL){
-            SHOW;
+            ProcessEvents()
             drawNumbers(node, rightChild);
+            update(buffer);
             wait();
         }
     }
@@ -30,12 +32,12 @@ void maxHeapify(uint8_t **buffer, int *heap, int heapSize, int node){
     }
 }
 
-void heapsort(uint8_t **buffer, int *numbers, int numbersSize){
+void heapsort(uint8_t *buffer, int *numbers, int numbersSize){
     int heapSize = numbersSize;
     
     // create max heap
-    int externalNodes = (heapSize + 1) / 2;
-    for(int node = heapSize / 2 - 1; node >= 0; node--){
+    const int lastInternalNode = (heapSize - 1) / 2;
+    for(int node = lastInternalNode; node >= 0; node--){
         maxHeapify(buffer, numbers, heapSize, node);
     }
 

@@ -6,6 +6,6 @@ Quicksort </br>
 Binary Radix Sort </br>
 Bucket Sort </br>
 Slow Sort </br>
-Counting sort </br>
 Bitonic sorter </br>
 Batcher odd–even mergesort </br>
+Tim Sort </br>

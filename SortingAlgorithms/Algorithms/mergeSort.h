@@ -9,14 +9,15 @@ int min(int a, int b){
     return (a < b) ? a : b;
 }
 
-void merge(uint8_t **buffer, int *numbers, int numbersSize, int from, int mid, int right){
+void merge(uint8_t *buffer, int *numbers, int numbersSize, int from, int mid, int right){
     int i = from;
     int j = mid;
     while(i < mid && j < right){
         if(numbers[i] < numbers[j]){
             if(buffer != NULL){
-                SHOW;
+                ProcessEvents()
                 drawNumbers(i, j);
+                update(buffer);
                 wait();
             }
             i++;
@@ -26,8 +27,9 @@ void merge(uint8_t **buffer, int *numbers, int numbersSize, int from, int mid, i
             for(int x = j; x > i; x--){
                 numbers[x] = numbers[x - 1];
                 if(buffer != NULL){
-                    SHOW;
+                    ProcessEvents()
                     drawNumbers(x, x - 1);
+                    update(buffer);
                     wait();
                 }
             }
@@ -38,7 +40,7 @@ void merge(uint8_t **buffer, int *numbers, int numbersSize, int from, int mid, i
     }
 }
 
-void mergeWithSpace(uint8_t **buffer, int *numbers, int numbersSize, int *temp, int left, int mid, int right){
+void mergeWithSpace(uint8_t *buffer, int *numbers, int numbersSize, int *temp, int left, int mid, int right){
     int i = left;
     int j = mid;
     int tSize = 0;
@@ -63,15 +65,16 @@ void mergeWithSpace(uint8_t **buffer, int *numbers, int numbersSize, int *temp, 
     for(int x = 0; x < tSize; x++){
         numbers[x + left] = temp[x];
         if(buffer != NULL){
-            SHOW;
+            ProcessEvents()
             drawNumbers(x + left, -1);
+            update(buffer);
             wait();
         }
     }
 }
 
 // bottom up
-void mergeSort(uint8_t **buffer, int *numbers, int numbersSize, bool space){
+void mergeSort(uint8_t *buffer, int *numbers, int numbersSize, bool space){
     int *temp = NULL;
     if(space){
        temp = malloc(sizeof(int) * numbersSize);
@@ -97,10 +100,10 @@ void mergeSort(uint8_t **buffer, int *numbers, int numbersSize, bool space){
     free(temp);
 }
 
-void mergeSortSpace(uint8_t **buffer, int *numbers, int numbersSize){
+void mergeSortSpace(uint8_t *buffer, int *numbers, int numbersSize){
     mergeSort(buffer, numbers, numbersSize, true);
 }
 
-void mergeSortNoSpace(uint8_t **buffer, int *numbers, int numbersSize){
+void mergeSortNoSpace(uint8_t *buffer, int *numbers, int numbersSize){
     mergeSort(buffer, numbers, numbersSize, false);
 }

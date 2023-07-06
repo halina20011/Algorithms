@@ -4,7 +4,7 @@
 
 #define STOOGESORT {"Stooge Sort", &stoogeSort}
 
-void stoogeSort(uint8_t **buffer, int *numbers, int numbersSize){
+void stoogeSort(uint8_t *buffer, int *numbers, int numbersSize){
     int i = 0;
     int j = numbersSize - 1;
     int pos = 1;
@@ -34,8 +34,9 @@ void stoogeSort(uint8_t **buffer, int *numbers, int numbersSize){
             swap(&numbers[j], &numbers[i]);
         }
         if(buffer != NULL){
-            SHOW;
+            ProcessEvents()
             drawNumbers(i, j);
+            update(buffer);
             wait();
         }
     }
@@ -43,13 +44,14 @@ void stoogeSort(uint8_t **buffer, int *numbers, int numbersSize){
     free(stack);
 }
 
-void stoogeSort2(uint8_t **buffer, int *numbers, int numbersSize, int i){
+void stoogeSort2(uint8_t *buffer, int *numbers, int numbersSize, int i){
     if(numbers[numbersSize - 1] < numbers[i]){
         swap(&numbers[i], &numbers[numbersSize - 1]);
     }
     if(buffer != NULL){
-        SHOW;
+        ProcessEvents()
         drawNumbers(i - 1, i);
+        update(buffer);
         wait();
     }
 

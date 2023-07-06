@@ -4,7 +4,7 @@
 
 #define BUBBLESORT {"Bubble Sort", &bubbleSort}
 
-void bubbleSort(uint8_t **buffer, int *numbers, int numbersSize){
+void bubbleSort(uint8_t *buffer, int *numbers, int numbersSize){
     bool isSorted = true;
 
     for(int i = 0; i < numbersSize - 1; i++){
@@ -16,8 +16,9 @@ void bubbleSort(uint8_t **buffer, int *numbers, int numbersSize){
                 isSorted = false;
             }
             if(buffer != NULL){
-                SHOW;
+                ProcessEvents()
                 drawNumbers(j, j + 1);
+                update(buffer);
                 wait();
             }
         }

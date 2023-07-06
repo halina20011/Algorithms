@@ -66,7 +66,7 @@ const float frameRateTable[8] = {1, 2, 5, 10, 50, 100, 250, 500};
 const short int frameRateMaxIndex = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
 unsigned short frameRateIndex = 5;
 
-bool process(){
+bool processEvents(){
     while(SDL_PollEvent(&event)){
         if(event.type == SDL_KEYDOWN){
             SDL_Keycode key = event.key.keysym.sym;
@@ -108,16 +108,15 @@ void wait(){
     SDL_Delay(frameDelay);
 }
 
-#define SHOW \
-    do{ \
-        bool result = (*process)(); \
+#define ProcessEvents() {\
+        bool result = (*processEvents)(); \
         if(result == 0){ \
             SDL_DestroyRenderer(renderer); \
             SDL_DestroyWindow(window); \
             SDL_Quit(); \
             exit(0); \
         } \
-    } while(0)
+    }
 
 #define WAIT \
     do{ \
@@ -138,9 +137,10 @@ void wait(){
 #include "Algorithms/cocktailSort.h"
 #include "Algorithms/heapsort.h"
 #include "Algorithms/mergeSort.h"
+#include "Algorithms/countingSort.h"
 
 struct Algorithm algorithms[] = {
-    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE
+    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE, COUNTINGSORT
 };
 
 int sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
@@ -359,7 +359,7 @@ int main(int argc, char **argv){
         return 1;
     }
 
-    const void (*algorithm)(uint8_t **buffer, int *numbers, int numbersSize) = algorithms[runAlgorithmIndex].algorithm;
+    const void (*algorithm)(uint8_t *buffer, int *numbers, int numbersSize) = algorithms[runAlgorithmIndex].algorithm;
 
     // int *numbersCopy = malloc(sizeof(int) * numbersSize);
     // memcpy(numbersCopy, numbers, sizeof(int) * numbersSize);
@@ -367,12 +367,12 @@ int main(int argc, char **argv){
     // printArray(numbersCopy, );
     // free(numbersCopy);
     
-    algorithm(&buffer, numbers, numbersSize);
+    algorithm(buffer, numbers, numbersSize);
 
-    drawFinalAnimation(&buffer, numbers, numbersSize);
+    drawFinalAnimation(buffer, numbers, numbersSize);
 
     // wait for user to exit
-    while(process()){}
+    while(processEvents()){}
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

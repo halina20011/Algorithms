@@ -2,7 +2,7 @@
 
 #define GNOMESORT {"Gnome Sort", &gnomeSort}
 
-void gnomeSort(uint8_t **buffer, int *numbers, int numbersSize){
+void gnomeSort(uint8_t *buffer, int *numbers, int numbersSize){
     int i = 0;
 
     while(i < numbersSize){
@@ -14,8 +14,9 @@ void gnomeSort(uint8_t **buffer, int *numbers, int numbersSize){
             i--;
         }
         if(buffer != NULL){
-            SHOW;
+            ProcessEvents()
             drawNumbers(i - 1, i);
+            update(buffer);
             wait();
         }
     }
