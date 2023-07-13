@@ -50,6 +50,8 @@ int numbersSize = -1;
 
 int numberWidth = 0;
 
+bool HIGHLIGHT = false;
+
 int capture = 0;
 // int capture = 2;
 uint16_t captureIndex = 0;
@@ -63,8 +65,8 @@ struct Algorithm{
 };
 
 const float frameRateTable[8] = {1, 2, 5, 10, 50, 100, 250, 500};
-const short int frameRateMaxIndex = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
-unsigned short frameRateIndex = 5;
+const short int frameRateSize = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
+unsigned short frameRateIndex = frameRateSize / 2;
 
 bool processEvents(){
     while(SDL_PollEvent(&event)){
@@ -75,12 +77,13 @@ bool processEvents(){
             }
         }
         else if(event.type == SDL_KEYUP){
-            SDL_Keycode key = event.key.keysym.sym;
+            const SDL_Keycode key = event.key.keysym.sym;
             
-            if(key == SDLK_RETURN){
-                if(frameRateIndex != 6){
-                    frameRateIndex = 6;
-                }
+            if(key == SDLK_s){
+                frameRateIndex = 0;
+            }
+            else if(key == SDLK_f){
+                frameRateIndex = frameRateSize - 1;
             }
             else if(key == SDLK_s || key == SDLK_DOWN){
                 if(0 < frameRateIndex){
@@ -88,7 +91,7 @@ bool processEvents(){
                 }
             }
             else if(key == SDLK_w || key == SDLK_UP){
-                if(frameRateIndex < frameRateMaxIndex - 1){
+                if(frameRateIndex < frameRateSize){
                     frameRateIndex++;
                 }
             }
@@ -118,14 +121,9 @@ void wait(){
         } \
     }
 
-#define WAIT \
-    do{ \
-        wait(); \
-    } while(0)
-
 #include "func.h"
 
-// include all Sorting Algorithms 
+// include all sorting algorithms 
 #include "Algorithms/bubbleSort.h"
 #include "Algorithms/selectionSort.h"
 #include "Algorithms/bogosort.h"
@@ -138,14 +136,15 @@ void wait(){
 #include "Algorithms/heapsort.h"
 #include "Algorithms/mergeSort.h"
 #include "Algorithms/countingSort.h"
+#include "Algorithms/slowsort.h"
 
 struct Algorithm algorithms[] = {
-    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE, COUNTINGSORT
+    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE, COUNTINGSORT, SLOWSORT
 };
 
 int sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
 
-#define optionsSize 7
+#define optionsSize 100
 
 const char options[optionsSize][2][50] = {
     {"-h", "show this help message"},
@@ -154,7 +153,10 @@ const char options[optionsSize][2][50] = {
     {"-ls", "list available sizes"},
     {"-l", "list all available algorithms"},
     {"-n", "custom input to sort e.g '[5,3,1,2]'"},
-    {"-N", "custom input to shuffle and then sort"}
+    {"-N", "custom input to shuffle and then sort"},
+    {"-r", "show region if available"},
+    {"--slow", "start in the slowest speed"},
+    {"--fast", "start in the fastest speed"}
 };
 
 void getAvailableSizes(){
@@ -305,6 +307,15 @@ int main(int argc, char **argv){
             }
             i++;
         }
+        else if(strcmp(flag, "-r") == 0){
+            HIGHLIGHT = true;
+        }
+        else if(strcmp(flag, "--slow") == 0){
+            frameRateIndex = 0;
+        }
+        else if(strcmp(flag, "--fast") == 0){
+            frameRateIndex = frameRateSize - 1;
+        }
     }
     
     if(runAlgorithmIndex == -1){
@@ -339,11 +350,11 @@ int main(int argc, char **argv){
     const double increase = (double)WINDOW_HEIGHT / (double)max;
     fillArray(numbers, numbersSize, increase);
 
-    printf("Algorithm: \"%s\"\n", algorithms[runAlgorithmIndex].name);
+    printf("algorithm: \"%s\"\n", algorithms[runAlgorithmIndex].name);
 
     // initialize SDL2
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
-        printf("Error initializing SDL: %s\n", SDL_GetError());
+        printf("error initializing SDL: %s\n", SDL_GetError());
     }
 
     // create a window and renderer
@@ -355,7 +366,7 @@ int main(int argc, char **argv){
     
     int r = newPixelBuffer(&buffer);
     if(r){
-        fprintf(stderr, "Error allocating memory for pixel buffer\n");
+        fprintf(stderr, "error allocating memory for pixel buffer\n");
         return 1;
     }
 

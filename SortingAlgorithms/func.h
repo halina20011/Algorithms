@@ -2,6 +2,7 @@
 #define FUNC
 
 #include <stdio.h>
+#include <stdbool.h>
 // for time
 #include <time.h>
 
@@ -11,6 +12,7 @@ extern int numberWidth;
 extern uint8_t *buffer;
 extern int *numbers;
 extern int numbersSize;
+extern bool HIGHLIGHT;
 
 void fillArray(int *array, int arraySize, double increase){
     for(int i = 0; i < arraySize; i++){
@@ -74,10 +76,10 @@ int searchInArray(int *array, int arraySize, int target){
     return -1;
 }
 
-void swap(int *x, int *y){
-    int temp = *(x);
-    *(x) = *(y);
-    *(y) = temp;
+void swap(int *a, int *b){
+    int temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
 void printArray(int *array, int arraySize){
@@ -113,6 +115,18 @@ void highlight(int index){
         drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[index], numberWidth, numbers[index]);
         setColor(255, 255, 255, 255);
     }
+}
+
+void highlightRegion(int left, int right){
+    if(!HIGHLIGHT)
+        return;
+    setColor(0, 0, 255, 255);
+    const int end = (right < numbersSize) ? right : numbersSize;
+    for(int i = left; i < end; i++){
+        int x = i * numberWidth;
+        drawRectangle(&buffer, x, 0, numberWidth, WINDOW_HEIGHT - numbers[i]);
+    }
+    setColor(255, 255, 255, 255);
 }
 
 void drawFinalAnimation(){

@@ -19,6 +19,7 @@ void cocktailSort(uint8_t *buffer, int *numbers, int numbersSize){
             if(buffer != NULL){
                 ProcessEvents()
                 drawNumbers(i, i + 1);
+                highlightRegion(start, end);
                 update(buffer);
                 wait();
             }
@@ -37,6 +38,7 @@ void cocktailSort(uint8_t *buffer, int *numbers, int numbersSize){
             if(buffer != NULL){
                 ProcessEvents()
                 drawNumbers(i - 1, i);
+                highlightRegion(start, end);
                 update(buffer);
                 wait();
             }

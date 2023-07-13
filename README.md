@@ -15,6 +15,7 @@ Radix Sort </br>
 Cocktail Sort </br>
 Heapsort </br>
 Merge Sort </br>
+Slowsort </br>
 
 ## Marching squares
 <img src="/Images/marchingSquares.png" alt="preview" width="300" style="height:auto;">

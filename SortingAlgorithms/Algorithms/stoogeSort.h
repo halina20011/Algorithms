@@ -4,7 +4,7 @@
 
 #define STOOGESORT {"Stooge Sort", &stoogeSort}
 
-void stoogeSort(uint8_t *buffer, int *numbers, int numbersSize){
+void stoogeSortStack(uint8_t *buffer, int *numbers, int numbersSize){
     int i = 0;
     int j = numbersSize - 1;
     int pos = 1;
@@ -44,21 +44,27 @@ void stoogeSort(uint8_t *buffer, int *numbers, int numbersSize){
     free(stack);
 }
 
-void stoogeSort2(uint8_t *buffer, int *numbers, int numbersSize, int i){
+void stoogeSortRec(uint8_t *buffer, int *numbers, int numbersSize, int i){
     if(numbers[numbersSize - 1] < numbers[i]){
-        swap(&numbers[i], &numbers[numbersSize - 1]);
+        swap(numbers + i, numbers + (numbersSize - 1));
     }
+    const int oneThird = (int)((numbersSize - i) / 3);
+
     if(buffer != NULL){
         ProcessEvents()
         drawNumbers(i - 1, i);
+        highlightRegion( i + oneThird, numbersSize - oneThird);
         update(buffer);
         wait();
     }
 
     if(2 < numbersSize - i){
-        int oneThird = (int)((numbersSize - i) / 3);
-        stoogeSort2(buffer, numbers, numbersSize - oneThird, i);
-        stoogeSort2(buffer, numbers, numbersSize, i + oneThird);
-        stoogeSort2(buffer, numbers, numbersSize - oneThird, i);
+        stoogeSortRec(buffer, numbers, numbersSize - oneThird, i);
+        stoogeSortRec(buffer, numbers, numbersSize, i + oneThird);
+        stoogeSortRec(buffer, numbers, numbersSize - oneThird, i);
     }
+}
+
+void stoogeSort(uint8_t *buffer, int *numbers, int numbersSize){
+    stoogeSortRec(buffer, numbers, numbersSize, 0);
 }
