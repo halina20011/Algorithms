@@ -1,6 +1,8 @@
 #ifndef PIXEL
 #define PIXEL
 
+#include "math.h"
+
 extern const int WINDOWWIDTH;
 extern const int WINDOWHEIGHT;
 
@@ -86,7 +88,7 @@ void fillBuffer(uint8_t *buffer){
 }
 
 int drawPixel(uint8_t **buffer, int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
-    if(WINDOWWIDTH <= x || WINDOWHEIGHT <= y){
+    if(x < 0 || WINDOWWIDTH <= x || y < 0 || WINDOWHEIGHT <= y){
         return 1;
     }
 
@@ -113,6 +115,20 @@ void drawLine(uint8_t **buffer, int x0, int y0, int x1, int y1){
         e2 = 2 * err;
         if(e2 >= dy){ err += dy; x0 += sx; } /* e_xy+e_x > 0 */
         if(e2 <= dx){ err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+    }
+}
+
+double calculateResolution(int radius){
+    return 360.0 / (2.0 * abs(radius) * M_PI);
+}
+
+void drawCircle(uint8_t **buffer, int x, int y, int radius){
+    double resolution = calculateResolution(radius);
+    for(double i = 0.0; i < 360.0; i += resolution){
+        int angle = i;
+        int x1 = radius * cos(angle * M_PI / 180.0);
+        int y1 = radius * sin(angle * M_PI / 180.0);
+        drawPixel(buffer, x + x1, y + y1, rgba[0], rgba[1], rgba[2], rgba[3]);
     }
 }
 

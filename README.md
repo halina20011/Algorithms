@@ -17,6 +17,9 @@ Heapsort </br>
 Merge Sort </br>
 Slowsort </br>
 
+## Minimum spanning tree
+<img src="/Images/minimumSpanningTree.png" alt="preview" width="300" style="height:auto;">
+
 ## Marching squares
 <img src="/Images/marchingSquares.png" alt="preview" width="300" style="height:auto;">
 
