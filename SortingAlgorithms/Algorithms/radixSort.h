@@ -1,21 +1,26 @@
 #include <limits.h>
 
+#include "../../pixel.h"
 #include "../func.h"
 #include "../singleLinkedList.h"
 
 #define RADIXSORT {"Radix Sort", &radixSort}
 
-void radixSort(uint8_t *buffer, int *numbers, int numbersSize){
+extern struct Pixel *p;
+
+void radixSort(int *numbers, int numbersSize){
     int minIndex = 0;
+
     for(int i = 0; i < numbersSize; i++){
+        drawNumbers();
+        pixelSetColor(p, 255, 255, 0, 255);
+        highlight(minIndex);
+        pixelSetColor(p, 255, 0, 0, 255);
+        highlight(i);
+        PixelWait();
+
         if(numbers[minIndex] < numbers[i]){
             minIndex = i;
-        }
-        if(buffer != NULL){
-            ProcessEvents()
-            drawNumbers(minIndex, i);
-            update(buffer);
-            wait();
         }
     }
     const int max = numbers[minIndex];
@@ -34,34 +39,41 @@ void radixSort(uint8_t *buffer, int *numbers, int numbersSize){
             // extract digit that will be used as a key
             int n = ((int)(numbers[i] / d)) % 10;
             add(heads + n, tails + n, numbers[i]);
-            if(buffer != NULL){
-                ProcessEvents()
-                drawNumbers(i, i);
-                update(buffer);
-                wait();
-            }
+            
+            drawNumbers();
+            pixelSetColor(p, 255, 0, 0, 255);
+            highlight(i);
+            PixelWait();
         }
 
         int pIndex = 0;
 
         for(int n = 0; n < 10; n++){
-            int d = deleteFirst((heads + n));
-            while(d != INT_MIN){
-                numbers[pIndex++] = d;
-                d = deleteFirst((heads + n));
-                if(buffer != NULL){
-                    ProcessEvents()
-                    drawNumbers(pIndex, pIndex);
-                    update(buffer);
-                    wait();
-                }
+            struct Node *curr = heads[n], *temp = NULL;
+            while(curr){
+                temp = curr;
+                curr = curr->next;
+                drawNumbers();
+                pixelSetColor(p, 255, 0, 0, 255);
+                highlight(pIndex);
+                PixelWait();
+
+                numbers[pIndex++] = temp->data;
+                free(temp);
             }
+
+            heads[n] = NULL;
+            tails[n] = NULL;
         }
     }
 
     for(int i = 0; i < 10; i++){
         free(heads[i]);
+        free(tails[i]);
     }
 
     free(heads);
+    free(tails);
+
+    drawFinalAnimation(numbers, numbersSize);
 }

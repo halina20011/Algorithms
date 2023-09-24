@@ -18,104 +18,55 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
 
-#include "../pixel.c"
+#include "../pixel.h"
 #include "../pngWrapper.c"
 
 // for time() and clock()
 #include <time.h>
 #include <math.h>
 
-#define WINDOW_WIDTH 600
-#define WINDOW_HEIGHT 600
+void mainLoop(struct Pixel *p){
+    clock_t start = clock(), diff;
 
-const int WINDOWWIDTH = WINDOW_WIDTH;
-const int WINDOWHEIGHT = WINDOW_HEIGHT;
-
-SDL_Event event;
-SDL_Renderer *renderer;
-SDL_Window *window;
-
-int generate(uint8_t **buffer){
-    unsigned seed = time(NULL); // time(0);
+    // generate
+    unsigned seed = time(NULL);
     srand(seed);
 
-    for(int y = 0; y < WINDOW_HEIGHT; y++){
-        for(int x = 0; x < WINDOW_WIDTH; x++){
-            int i = 4 * (y * WINDOW_WIDTH + x);
-            *(*buffer + i + 0) = rand() % 255 + 1;
-            *(*buffer + i + 1) = rand() % 255 + 1;
-            *(*buffer + i + 2) = rand() % 255 + 1;
-            *(*buffer + i + 3) = 255;
+    for(int y = 0; y < p->height; y++){
+        for(int x = 0; x < p->width; x++){
+            int i = 4 * (y * p->width + x);
+            p->buffer[i + 0] = rand() % 255 + 1;
+            p->buffer[i + 1] = rand() % 255 + 1;
+            p->buffer[i + 2] = rand() % 255 + 1;
+            p->buffer[i + 3] = 255;
         }
     }
 
-    return 0;
-}
-
-int mainLoop(uint8_t **buffer){
-    clock_t start = clock(), diff;
-    // printf("Generating...\n");
-    generate(buffer);
-
-    // printf("Drawing...\n");
-    update(*buffer);
-    // printf("Drawn...\n");
+    pixelUpdate(p);
 
     diff = clock() - start;
     int msec = diff * 1000 / CLOCKS_PER_SEC;
     printf("Time taken %d seconds %d milliseconds\n", msec / 1000, msec % 1000);
     
     fflush(stdout);
-
-    return 0;
 }
 
 int main(){
-    // Initialize SDL2
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
-        printf("Error initializing SDL: %s\n", SDL_GetError());
-    }
+    struct Pixel *p = pixelInit("Template", 600, 600);
 
-    // Create a window and renderer
-    window = SDL_CreateWindow("Template", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    mainLoop(p);
 
-    uint8_t *buffer = NULL;
-    int r = newPixelBuffer(&buffer);
-    if(r){
-        printf("Error allocating memory for pixel buffer\n");
-        return 1;
-    }
-
-    mainLoop(&buffer);
-
-    int run = 1;
-    while(run){
-        while(SDL_PollEvent(&event)){
-            if(event.type == SDL_KEYDOWN){
-                SDL_Keycode key = event.key.keysym.sym;
-                if(key == SDLK_q || key == SDLK_ESCAPE){
-                    run = 0;
-                }
-                else if(key == SDLK_RETURN){
-                    mainLoop(&buffer);
-                }
-                else if(key == SDLK_s){
-                    savePng("template.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
-                    printf("Image saved\n");
-                }
-            }
-            else if(event.type == SDL_QUIT){
-                run = 0;
-            }
+    while(1){
+        int r = pixelEvents(p);
+        if(r == PIXEL_EXIT){
+            break;
+        }
+        else if(r == PIXEL_RUN){
+            mainLoop(p);
         }
     }
 
-    free(buffer);
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    pixelFree(p);
 
     return 0;
 }

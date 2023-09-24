@@ -24,8 +24,10 @@
 #include "./unionFind.h"
 #include "./vector.h"
 
-#include "../pixel.c"
+#include "../pixel.h"
 #include "./graphDraw.h"
+
+extern struct Pixel *p;
 
 struct Connection{
     int a, b;
@@ -38,7 +40,7 @@ int comp(const void *a, const void *b){
     return (y < x) - (x < y);
 }
 
-void kruskalsAlgorithm(uint8_t *buffer, struct Vertex **points, size_t pointsSize){
+void kruskalsAlgorithm(struct Vertex **points, size_t pointsSize){
     struct Vector *v;
     vectorInit(&v);
 
@@ -64,18 +66,17 @@ void kruskalsAlgorithm(uint8_t *buffer, struct Vertex **points, size_t pointsSiz
     qsort(c, conSize, sizeof(struct Connection*), comp);
     
     size_t toConnect = pointsSize - 1;
-    bool run = true;
     for(size_t i = 0; i < conSize && toConnect; i++){
         drawGraph(points, pointsSize, (struct Edge**)v->val, v->size);
-        wait();
+        pixelWait(p);
 
         const int parentA = disjointUnionFind(u, c[i]->a);
         const int parentB = disjointUnionFind(u, c[i]->b);
 
-        setColor(0, 0, 255, 255);
-        drawEdge(buffer, &(struct Edge){.a=points[c[i]->a], .b=points[c[i]->b]});
-        update(buffer);
-        wait();
+        pixelSetColor(p, 0, 0, 255, 255);
+        drawEdge(&(struct Edge){.a=points[c[i]->a], .b=points[c[i]->b]});
+        pixelUpdate(p);
+        pixelWait(p);
 
         // add edge
         if(parentA != parentB){
@@ -84,20 +85,17 @@ void kruskalsAlgorithm(uint8_t *buffer, struct Vertex **points, size_t pointsSiz
             toConnect--;
         }
 
-        bool result = processEvents();
-        if(result == 0){
-            run = false;
+        if(pixelEvents(p) == PIXEL_EXIT){
             break;
         }
 
-        wait();
+        pixelWait(p);
     }
-
-
-    while(processEvents() && run){}
 
     drawGraph(points, pointsSize, (struct Edge**)v->val, v->size);
   
+    pixelWaitExit(p);
+
     disjointUnionFree(u);
     vectorFree(v);
 

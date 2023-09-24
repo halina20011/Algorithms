@@ -1,42 +1,38 @@
 #include <stdbool.h>
 
+#include "../../pixel.h"
 #include "../func.h"
 
 #define ODDEVENSORT {"Odd-even Sort", &oddevenSort}
 
-void oddevenSort(uint8_t *buffer, int *numbers, int numbersSize){
+extern struct Pixel *p;
+
+void oddevenSort(int *numbers, int numbersSize){
     bool sorted = false;
 
-    while(sorted == false){
+    while(!sorted){
         sorted = true;
+    
+        // even = 0, odd = 1
+        for(int t = 0; t < 2; t++){
+            for(int i = t; i < numbersSize - 1; i += 2){
+                drawNumbers();
+                pixelSetColor(p, 255, 0, 0, 255);
+                highlight(i);
+                highlight(i + 1);
+                PixelWait();
 
-        // odd part
-        for(int i = 1; i < numbersSize - 1; i += 2){
-            if(numbers[i + 1] < numbers[i]){
-                swap(&numbers[i], &numbers[i + 1]);
-                sorted = false;
+                if(numbers[i + 1] < numbers[i]){
+                    swapNumbers(i, i + 1);
+                    sorted = false;
+                }
             }
-            if(buffer != NULL){
-                ProcessEvents()
-                drawNumbers(i, i + 1);
-                update(buffer);
-                wait();
+
+            if(sorted){
+                break;
             }
         }
-
-        // even part
-        for(int i = 0; i < numbersSize; i += 2){
-            if(numbers[i + 1] < numbers[i]){
-                swap(&numbers[i], &numbers[i + 1]);
-                sorted = false;
-            }
-            if(buffer != NULL){
-                ProcessEvents()
-                drawNumbers(i, i + 1);
-                update(buffer);
-                wait();
-            }
-        }
-
     }
+
+    drawFinalAnimation(numbers, numbersSize);
 }

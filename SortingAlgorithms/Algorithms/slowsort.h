@@ -1,28 +1,32 @@
+#include "../../pixel.h"
 #include "../func.h"
 
 #define SLOWSORT {"Slowsort", &slowsort}
 
-void Slowsort(uint8_t *buffer, int *numbers, int left, int right){
+extern struct Pixel *p;
+
+void Slowsort(int *numbers, int left, int right){
     if(right <= left)
         return;
 
     const int m = left + (right - left) / 2;
-    if(buffer != NULL){
-        ProcessEvents()
-        drawNumbers(m, m);
-        highlightRegion(left, right);
-        update(buffer);
-        wait();
-    }
-    Slowsort(buffer, numbers, left, m);
-    Slowsort(buffer, numbers, m + 1, right);
+    drawNumbers();
+    highlightRegion(left, right);
+    pixelSetColor(p, 255, 0, 0, 255);
+    highlight(m);
+    PixelWait();
+
+    Slowsort(numbers, left, m);
+    Slowsort(numbers, m + 1, right);
+
     if(numbers[right] < numbers[m]){
-        swap(numbers + right, numbers + m);
+        swapNumbers(right, m);
     }
 
-    Slowsort(buffer, numbers, left, right - 1);
+    Slowsort(numbers, left, right - 1);
 }
 
-void slowsort(uint8_t *buffer, int *numbers, int numbersSize){
-    Slowsort(buffer, numbers, 0, numbersSize - 1);
+void slowsort(int *numbers, int numbersSize){
+    Slowsort(numbers, 0, numbersSize - 1);
+    drawFinalAnimation(numbers, numbersSize);
 }

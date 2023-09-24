@@ -1,10 +1,13 @@
 #include <math.h>
 
+#include "../../pixel.h"
 #include "../func.h"
 
 #define STOOGESORT {"Stooge Sort", &stoogeSort}
 
-void stoogeSortStack(uint8_t *buffer, int *numbers, int numbersSize){
+extern struct Pixel *p;
+
+void stoogeSortStack(int *numbers, int numbersSize){
     int i = 0;
     int j = numbersSize - 1;
     int pos = 1;
@@ -15,6 +18,12 @@ void stoogeSortStack(uint8_t *buffer, int *numbers, int numbersSize){
     stack[1] = j;
 
     while(0 <= pos){
+        drawNumbers();
+        pixelSetColor(p, 255, 0, 0, 255);
+        highlight(i);
+        highlight(j);
+        PixelWait();
+
         j = stack[pos--];
         i = stack[pos--];
 
@@ -31,40 +40,35 @@ void stoogeSortStack(uint8_t *buffer, int *numbers, int numbersSize){
         }
 
         if(numbers[j] < numbers[i]){
-            swap(&numbers[j], &numbers[i]);
-        }
-        if(buffer != NULL){
-            ProcessEvents()
-            drawNumbers(i, j);
-            update(buffer);
-            wait();
+            swapNumbers(j, i);
         }
     }
 
     free(stack);
 }
 
-void stoogeSortRec(uint8_t *buffer, int *numbers, int numbersSize, int i){
+void stoogeSortRec(int *numbers, int numbersSize, int i){
     if(numbers[numbersSize - 1] < numbers[i]){
-        swap(numbers + i, numbers + (numbersSize - 1));
+        swapNumbers(i, numbersSize - 1);
     }
-    const int oneThird = (int)((numbersSize - i) / 3);
 
-    if(buffer != NULL){
-        ProcessEvents()
-        drawNumbers(i - 1, i);
-        highlightRegion( i + oneThird, numbersSize - oneThird);
-        update(buffer);
-        wait();
-    }
+    const int oneThird = (int)((numbersSize - i) / 3);
+    
+    drawNumbers();
+    highlightRegion(i + oneThird, numbersSize - oneThird);
+    pixelSetColor(p, 255, 0, 0, 255);
+    highlight(i - 1);
+    highlight(i);
+    PixelWait();
 
     if(2 < numbersSize - i){
-        stoogeSortRec(buffer, numbers, numbersSize - oneThird, i);
-        stoogeSortRec(buffer, numbers, numbersSize, i + oneThird);
-        stoogeSortRec(buffer, numbers, numbersSize - oneThird, i);
+        stoogeSortRec(numbers, numbersSize - oneThird, i);
+        stoogeSortRec(numbers, numbersSize, i + oneThird);
+        stoogeSortRec(numbers, numbersSize - oneThird, i);
     }
 }
 
-void stoogeSort(uint8_t *buffer, int *numbers, int numbersSize){
-    stoogeSortRec(buffer, numbers, numbersSize, 0);
+void stoogeSort(int *numbers, int numbersSize){
+    stoogeSortRec(numbers, numbersSize, 0);
+    drawFinalAnimation(numbers, numbersSize);
 }

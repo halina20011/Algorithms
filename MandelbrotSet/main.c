@@ -15,24 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_render.h>
-
 #include <math.h>
 
-#include "../pixel.c"
-#include "../pngWrapper.c"
+#include "../pixel.h"
 #include "../rgba.h"
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
-
-const int WINDOWWIDTH = WINDOW_WIDTH;
-const int WINDOWHEIGHT = WINDOW_HEIGHT;
-
-SDL_Event event;
-SDL_Renderer *renderer;
-SDL_Window *window;
 
 float cenX = 0.0;
 float cenY = 0.0;
@@ -71,7 +60,7 @@ float smoothColor(float n, float x, float y){
     return 1.0 + n - log(log(hypot(x, y))) / log(2.0);
 }
 
-void mandelbrotSet(uint8_t **buffer, int width, int height){
+void mandelbrotSet(struct Pixel *p, int width, int height){
     long double px = 0.0; 
     long double py = 0.0;
 
@@ -109,57 +98,23 @@ void mandelbrotSet(uint8_t **buffer, int width, int height){
             //     r = 115; g = 115; b = 115;
             // }
 
-            *(*buffer + i + 0) = r;
-            *(*buffer + i + 1) = g;
-            *(*buffer + i + 2) = b;
-            *(*buffer + i + 3) = 255;
+            p->buffer[i + 0] = r;
+            p->buffer[i + 1] = g;
+            p->buffer[i + 2] = b;
+            p->buffer[i + 3] = 255;
         }
     }
 }
 
 int main(){
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
-        printf("Error initializing SDL: %s\n", SDL_GetError());
-    }
+    struct Pixel *p = pixelInit("Mandelbrot set", WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    // Create a window and renderer
-    window = SDL_CreateWindow("Mandelbrot set", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    mandelbrotSet(p, p->width, p->height);
+    pixelUpdate(p);
     
-    uint8_t *buffer = NULL;
-    int r = newPixelBuffer(&buffer);
-    if(r){
-        printf("Error allocating memory for pixel buffer\n");
-        return 1;
-    }
+    pixelWaitExit(p);
 
-    mandelbrotSet(&buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
-    update(buffer);
-    
-    int run = 1;
-    while(run){
-        while(SDL_PollEvent(&event)){
-            if(event.type == SDL_KEYDOWN){
-                SDL_Keycode key = event.key.keysym.sym;
-                if(key == SDLK_q || key == SDLK_ESCAPE){
-                    run = 0;
-                }
-                else if(key == SDLK_s){
-                    savePng("mandelbrotSet.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
-                    printf("Image saved\n");
-                }
-            }
-            else if(event.type == SDL_QUIT){
-                run = 0;
-            }
-        }
-    }
-
-    free(buffer);
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    pixelFree(p);
 
     return 0;
 }

@@ -1,22 +1,29 @@
 #include "../func.h"
+#include "../../pixel.h"
 
 #define INSERTIONSORT {"Insertion Sort", &insertionSort}
 
-void insertionSort(uint8_t *buffer, int *numbers, int numbersSize){
+extern struct Pixel *p;
+
+void insertionSort(int *numbers, int numbersSize){
     for(int i = 1; i < numbersSize; i++){
         for(int j = i - 1; j >= 0; j--){
-            if(buffer != NULL){
-                ProcessEvents()
-                drawNumbers(j, j + 1);
-                update(buffer);
-                wait();
-            }
+            drawNumbers();
+
+            pixelSetColor(p, 255, 0, 0, 255);
+            highlight(j);
+            highlight(j + 1);
+
+            PixelWait();
+
             if(numbers[j + 1] < numbers[j]){
-                swap(&numbers[j], &numbers[j + 1]);
+                swapNumbers(j, j + 1);
             }
             else{
                 break;
             }
         }
     }
+
+    drawFinalAnimation(numbers, numbersSize);
 }

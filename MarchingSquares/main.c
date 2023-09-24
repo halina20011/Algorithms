@@ -15,30 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_render.h>
-
 #include <stdlib.h>
 #include <time.h>
 
-#include "../pixel.c"
+#include "../pixel.h"
 #include "../pngWrapper.c"
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 
-const int WINDOWWIDTH = WINDOW_WIDTH;
-const int WINDOWHEIGHT = WINDOW_HEIGHT;
-
-SDL_Event event;
-SDL_Renderer *renderer;
-SDL_Window *window;
-
-void drawPoints(uint8_t **buffer, int **field, int columns, int rows, int resolution){
+void drawPoints(struct Pixel *p, int **field, int columns, int rows, int resolution){
+    pixelSetColor(p, 255, 0, 0, 255);
     for(int i = 0; i < columns; i++){
         for(int j = 0; j < rows; j++){
             if(1 <= field[i][j]){
-                drawPixel(buffer, j * resolution, i * resolution, 255, 0, 0, 255);
+                pixelDraw(p, j * resolution, i * resolution);
             }
         }
     }
@@ -48,7 +39,7 @@ int getState(int a, int b, int c, int d){
     return d * 8 + c * 4 + b * 2 + a * 1;
 }
 
-void drawIsolines(uint8_t **buffer, int **field, int m, int n, int resolution){
+void drawIsolines(struct Pixel *p, int **field, int m, int n, int resolution){
     for(int i = 0; i < m - 1; i++){
         for(int j = 0; j < n - 1; j++){
             int x = j * resolution;
@@ -71,48 +62,48 @@ void drawIsolines(uint8_t **buffer, int **field, int m, int n, int resolution){
                 case 0:
                     break;
                 case 1:
-                    drawLine(buffer, c[0], c[1], d[0], d[1]);
+                    drawLine(p, c[0], c[1], d[0], d[1]);
                     break;
                 case 2:
-                    drawLine(buffer, b[0], b[1], c[0], c[1]);
+                    drawLine(p, b[0], b[1], c[0], c[1]);
                     break;
                 case 3:
-                    drawLine(buffer, b[0], b[1], d[0], d[1]);
+                    drawLine(p, b[0], b[1], d[0], d[1]);
                     break;
                 case 4:
-                    drawLine(buffer, a[0], a[1], b[0], b[1]);
+                    drawLine(p, a[0], a[1], b[0], b[1]);
                     break;
                 case 5:
-                    drawLine(buffer, a[0], a[1], d[0], d[1]);
-                    drawLine(buffer, b[0], b[1], c[0], c[1]);
+                    drawLine(p, a[0], a[1], d[0], d[1]);
+                    drawLine(p, b[0], b[1], c[0], c[1]);
                     break;
                 case 6:
-                    drawLine(buffer, a[0], a[1], c[0], c[1]);
+                    drawLine(p, a[0], a[1], c[0], c[1]);
                     break;
                 case 7:
-                    drawLine(buffer, a[0], a[1], d[0], d[1]);
+                    drawLine(p, a[0], a[1], d[0], d[1]);
                     break;
                 case 8:
-                    drawLine(buffer, a[0], a[1], d[0], d[1]);
+                    drawLine(p, a[0], a[1], d[0], d[1]);
                     break;
                 case 9: 
-                    drawLine(buffer, a[0], a[1], c[0], c[1]);
+                    drawLine(p, a[0], a[1], c[0], c[1]);
                     break;
                 case 10: 
-                    drawLine(buffer, a[0], a[1], b[0], b[1]);
-                    drawLine(buffer, d[0], d[1], c[0], c[1]);
+                    drawLine(p, a[0], a[1], b[0], b[1]);
+                    drawLine(p, d[0], d[1], c[0], c[1]);
                     break;
                 case 11: 
-                    drawLine(buffer, a[0], a[1], b[0], b[1]);
+                    drawLine(p, a[0], a[1], b[0], b[1]);
                     break;
                 case 12: 
-                    drawLine(buffer, b[0], b[1], d[0], d[1]);
+                    drawLine(p, b[0], b[1], d[0], d[1]);
                     break;
                 case 13: 
-                    drawLine(buffer, b[0], b[1], c[0], c[1]);
+                    drawLine(p, b[0], b[1], c[0], c[1]);
                     break;
                 case 14: 
-                    drawLine(buffer, d[0], d[1], c[0], c[1]);
+                    drawLine(p, d[0], d[1], c[0], c[1]);
                     break;
                 case 15:
                     break;
@@ -122,10 +113,10 @@ void drawIsolines(uint8_t **buffer, int **field, int m, int n, int resolution){
 }
 
 int **makeArray(int columns, int rows){
-    int **field = (int**)malloc(sizeof(int *) * columns);
+    int **field = malloc(sizeof(int *) * columns);
     
     for(int i = 0; i < columns; i++){
-        *(field + i) = (int*)malloc(sizeof(int) * rows);
+        field[i] = malloc(sizeof(int) * rows);
     }
 
     return field;
@@ -139,7 +130,7 @@ void freeArray(int **array, int width){
     free(array);
 }
 
-void marchingSquares(uint8_t **buffer, int **field, int columns, int rows, int resolution){
+void marchingSquares(struct Pixel *p, int **field, int columns, int rows, int resolution){
     unsigned seed = time(NULL); // time(0);
     srand(seed);
     
@@ -159,14 +150,14 @@ void marchingSquares(uint8_t **buffer, int **field, int columns, int rows, int r
     //     printf("\n");
     // }
 
-    setColor(0, 0, 0, 255);
-    fillBuffer(*buffer);
+    pixelSetColor(p, 0, 0, 0, 255);
+    pixelFill(p);
 
     // Set new color
-    setColor(255, 0, 0, 255);
-    // drawPoints(buffer, field, columns, rows, resolution);
-    drawIsolines(buffer, field, columns, rows, resolution);
-    update(*buffer);
+    pixelSetColor(p, 255, 0, 0, 255);
+    // drawPoints(p, field, columns, rows, resolution);
+    drawIsolines(p, field, columns, rows, resolution);
+    pixelUpdate(p);
 }
 
 int main(int argc, char **argv){
@@ -175,51 +166,24 @@ int main(int argc, char **argv){
     int rows = 1 + WINDOW_HEIGHT / resolution;
     
     int **field = makeArray(columns, rows);
+    
+    struct Pixel *p = pixelInit("Marching Squares", WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
-        printf("Error initializing SDL: %s\n", SDL_GetError());
-    }
+    marchingSquares(p, field, columns, rows, resolution);
 
-    // Create a window and renderer
-    window = SDL_CreateWindow("Marching Squares", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    uint8_t *buffer = NULL;
-    int r = newPixelBuffer(&buffer);
-    if(r){
-        printf("Error allocating memory for pixel buffer\n");
-        return 1;
-    }
-
-    marchingSquares(&buffer, field, columns, rows, resolution);
-
-    int run = 1;
-    while(run){
-        while(SDL_PollEvent(&event)){
-            if(event.type == SDL_KEYDOWN){
-                SDL_Keycode key = event.key.keysym.sym;
-                if(key == SDLK_q || key == SDLK_ESCAPE){
-                    run = 0;
-                }
-                else if(key == SDLK_RETURN){
-                    marchingSquares(&buffer, field, columns, rows, resolution);
-                }
-                else if(key == SDLK_s){
-                    savePng("marchingSquares.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
-                    printf("Image saved\n");
-                }
-            }
-            else if(event.type == SDL_QUIT){
-                run = 0;
-            }
+    while(1){
+        int r = pixelEvents(p);
+        if(r == PIXEL_EXIT){
+            break;
+        }
+        else if(r == PIXEL_RUN){
+            marchingSquares(p, field, columns, rows, resolution);
         }
     }
     
     freeArray(field, columns);
     
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    pixelFree(p);
 
     return 0;
 }

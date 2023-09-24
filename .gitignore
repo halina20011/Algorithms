@@ -1,3 +1,5 @@
 **/Build
 **/Capture
 **/l.txt
+**/*.raw
+**/.gdb_history

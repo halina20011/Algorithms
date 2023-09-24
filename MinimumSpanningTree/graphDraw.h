@@ -18,32 +18,34 @@
 
 #include <stdlib.h>
 
-#include "../pixel.c"
+#include "../pixel.h"
 #include "./graph.h"
 
+extern struct Pixel *p;
 
-void drawVertex(uint8_t *buffer, struct Vertex *v){
-    drawCircle(&buffer, v->x, v->y, 5);
+void drawVertex(struct Vertex *v){
+    drawCircle(p, v->x, v->y, 5);
 }
 
-void drawEdge(uint8_t *buffer, struct Edge *e){
-    drawLine(&buffer, e->a->x, e->a->y, e->b->x, e->b->y);
+void drawEdge(struct Edge *e){
+    drawLine(p, e->a->x, e->a->y, e->b->x, e->b->y);
 }
 
 void drawGraph(struct Vertex **verticies, const size_t vertexSize, struct Edge **edges, const size_t edgesSize){
-    setColor(0, 0, 0, 255);
-    fillBuffer(buffer);
-    setColor(255, 255, 255, 255);
+    pixelSetColor(p, 0, 0, 0, 255);
+    pixelFill(p);
+    pixelSetColor(p, 255, 255, 255, 255);
+
     for(size_t i = 0; i < vertexSize; i++){
-        drawVertex(buffer, verticies[i]);
+        drawVertex(verticies[i]);
     }
 
-    setColor(255, 0, 0, 255);
+    pixelSetColor(p, 255, 0, 0, 255);
     for(size_t i = 0; i < edgesSize; i++){
-        drawEdge(buffer, edges[i]);
+        drawEdge(edges[i]);
     }
 
-    update(buffer);
+    pixelUpdate(p);
 }
 
 #endif

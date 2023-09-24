@@ -24,27 +24,18 @@
 #include <inttypes.h>
 #include <math.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_render.h>
-
 // #define CAPTURE_ON true
-#include "../pixel.c"
+#include "../pixel.h"
 #include "../pngWrapper.c"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-const int WINDOWWIDTH = WINDOW_WIDTH;
-const int WINDOWHEIGHT = WINDOW_HEIGHT;
-
-SDL_Window *window;
-SDL_Renderer *renderer;
-SDL_Event event;
+struct Pixel *p = NULL;
 
 int *availableSizes = NULL;
 int availableSizesSize;
 
-uint8_t *buffer = NULL;
 int *numbers = NULL;
 int numbersSize = -1;
 
@@ -64,87 +55,33 @@ struct Algorithm{
     const void *algorithm;
 };
 
-const float frameRateTable[8] = {1, 2, 5, 10, 50, 100, 250, 500};
-const short int frameRateSize = sizeof(frameRateTable) / sizeof(frameRateTable[0]);
-unsigned short frameRateIndex = frameRateSize / 2;
-
-bool processEvents(){
-    while(SDL_PollEvent(&event)){
-        if(event.type == SDL_KEYDOWN){
-            SDL_Keycode key = event.key.keysym.sym;
-            if(key == SDLK_q || key == SDLK_ESCAPE){
-                return false;
-            }
-        }
-        else if(event.type == SDL_KEYUP){
-            const SDL_Keycode key = event.key.keysym.sym;
-            
-            if(key == SDLK_s){
-                frameRateIndex = 0;
-            }
-            else if(key == SDLK_f){
-                frameRateIndex = frameRateSize - 1;
-            }
-            else if(key == SDLK_s || key == SDLK_DOWN){
-                if(0 < frameRateIndex){
-                    frameRateIndex--;
-                }
-            }
-            else if(key == SDLK_w || key == SDLK_UP){
-                if(frameRateIndex < frameRateSize){
-                    frameRateIndex++;
-                }
-            }
-        }
-        else if(event.type == SDL_QUIT){
-            return false;
-        }
-    }
-
-    return true;
-}
-
-#define frameRate  ((float)frameRateTable[frameRateIndex])
-#define frameDelay ((Uint32)1000 / (Uint32)frameRate)
-
-void wait(){
-    SDL_Delay(frameDelay);
-}
-
-#define ProcessEvents() {\
-        bool result = (*processEvents)(); \
-        if(result == 0){ \
-            SDL_DestroyRenderer(renderer); \
-            SDL_DestroyWindow(window); \
-            SDL_Quit(); \
-            exit(0); \
-        } \
-    }
-
 #include "func.h"
+#include "singleLinkedList.h"
 
 // include all sorting algorithms 
 #include "Algorithms/bubbleSort.h"
-#include "Algorithms/selectionSort.h"
-#include "Algorithms/bogosort.h"
 #include "Algorithms/insertionSort.h"
-#include "Algorithms/gnomeSort.h"
+#include "Algorithms/selectionSort.h"
 #include "Algorithms/oddevenSort.h"
-#include "Algorithms/stoogeSort.h"
-#include "Algorithms/radixSort.h"
 #include "Algorithms/cocktailSort.h"
+#include "Algorithms/gnomeSort.h"
+
+#include "Algorithms/radixSort.h"
 #include "Algorithms/heapsort.h"
 #include "Algorithms/mergeSort.h"
 #include "Algorithms/countingSort.h"
+
+#include "Algorithms/stoogeSort.h"
+#include "Algorithms/bogosort.h"
 #include "Algorithms/slowsort.h"
 
 struct Algorithm algorithms[] = {
-    BUBBLESORT, INSERTIONSORT, GNOMESORT, ODDEVENSORT, STOOGESORT, COCKTAILSORT, BOGOSORT, SELECTIONSORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE, COUNTINGSORT, SLOWSORT
+    BUBBLESORT, INSERTIONSORT, SELECTIONSORT,ODDEVENSORT, COCKTAILSORT, GNOMESORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE, COUNTINGSORT, STOOGESORT, BOGOSORT, SLOWSORT
 };
 
 int sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);
 
-#define optionsSize 100
+#define optionsSize 10
 
 const char options[optionsSize][2][50] = {
     {"-h", "show this help message"},
@@ -159,11 +96,19 @@ const char options[optionsSize][2][50] = {
     {"--fast", "start in the fastest speed"}
 };
 
+int comp(const void *a, const void *b){
+    const int x = *(int*)a;
+    const int y = *(int*)b;
+
+    return (y < x) - (x < y);
+}
+
 void getAvailableSizes(){
     divisotors(NULL, WINDOW_WIDTH, &availableSizesSize);
     availableSizes = malloc(sizeof(int) * availableSizesSize);
     divisotors(availableSizes, WINDOW_WIDTH, &availableSizesSize);
-    mergeSort(NULL, availableSizes, availableSizesSize, true);
+
+    qsort(availableSizes, availableSizesSize, sizeof(int), comp);
 }
 
 void showOptions(){
@@ -183,7 +128,6 @@ void showAlgorithms(){
     }
 }
 
-#include "singleLinkedList.h"
 int parseInput(char *input, int **array, int *arraySize){
     char *iPtr = input;
 
@@ -231,6 +175,7 @@ int main(int argc, char **argv){
     bool customInput = false;
     numbersSize = -1;
     int runAlgorithmIndex = -1;
+    int initialSpeed = -1;
     if(argc == 1){
         showOptions();
         return 1;
@@ -311,10 +256,15 @@ int main(int argc, char **argv){
             HIGHLIGHT = true;
         }
         else if(strcmp(flag, "--slow") == 0){
-            frameRateIndex = 0;
+            initialSpeed = 0;
         }
         else if(strcmp(flag, "--fast") == 0){
-            frameRateIndex = frameRateSize - 1;
+            initialSpeed = 1;
+        }
+        else{
+            fprintf(stderr, "Invalid option:\"%s\"\n", flag);
+            fprintf(stderr, "Try: \"%s -h\" for more information\n", argv[0]);
+            return 1;
         }
     }
     
@@ -352,25 +302,13 @@ int main(int argc, char **argv){
 
     printf("algorithm: \"%s\"\n", algorithms[runAlgorithmIndex].name);
 
-    // initialize SDL2
-    if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
-        printf("error initializing SDL: %s\n", SDL_GetError());
-    }
-
-    // create a window and renderer
-    window = SDL_CreateWindow("Sorting Algorithms", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    p = pixelInit("Sorting Algorithms", WINDOW_WIDTH, WINDOW_HEIGHT);
     
-    int r = newPixelBuffer(&buffer);
-    if(r){
-        fprintf(stderr, "error allocating memory for pixel buffer\n");
-        return 1;
+    if(initialSpeed != -1){
+        pixelSetSpeed(p, initialSpeed);
     }
 
-    const void (*algorithm)(uint8_t *buffer, int *numbers, int numbersSize) = algorithms[runAlgorithmIndex].algorithm;
+    const void (*algorithm)(int *numbers, int numbersSize) = algorithms[runAlgorithmIndex].algorithm;
 
     // int *numbersCopy = malloc(sizeof(int) * numbersSize);
     // memcpy(numbersCopy, numbers, sizeof(int) * numbersSize);
@@ -378,17 +316,12 @@ int main(int argc, char **argv){
     // printArray(numbersCopy, );
     // free(numbersCopy);
     
-    algorithm(buffer, numbers, numbersSize);
+    algorithm(numbers, numbersSize);
 
-    drawFinalAnimation(buffer, numbers, numbersSize);
-
-    // wait for user to exit
-    while(processEvents()){}
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-
-    SDL_Quit();
+    pixelWaitExit(p);
+    
+    free(numbers);
+    pixelFree(p);
 
     return 0;
 }

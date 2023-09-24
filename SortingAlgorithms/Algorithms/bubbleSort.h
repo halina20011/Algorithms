@@ -1,25 +1,30 @@
 #include <stdbool.h>
 
+#include "../../pixel.h"
 #include "../func.h"
 
 #define BUBBLESORT {"Bubble Sort", &bubbleSort}
 
-void bubbleSort(uint8_t *buffer, int *numbers, int numbersSize){
+extern struct Pixel *p;
+
+void bubbleSort(int *numbers, int numbersSize){
     bool isSorted = true;
 
     for(int i = 0; i < numbersSize - 1; i++){
         isSorted = true;
 
         for(int j = 0; j < numbersSize - i - 1; j++){
+            drawNumbers();
+
+            pixelSetColor(p, 255, 0, 0, 255);
+            highlight(j);
+            highlight(j + 1);
+
+            PixelWait();
+
             if(numbers[j + 1] < numbers[j]){
-                swap(&numbers[j], &numbers[j + 1]);
+                swapNumbers(j, j + 1);
                 isSorted = false;
-            }
-            if(buffer != NULL){
-                ProcessEvents()
-                drawNumbers(j, j + 1);
-                update(buffer);
-                wait();
             }
         }
 
@@ -27,4 +32,6 @@ void bubbleSort(uint8_t *buffer, int *numbers, int numbersSize){
             break;
         }
     }
+    
+    drawFinalAnimation(numbers, numbersSize);
 }

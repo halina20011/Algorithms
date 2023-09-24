@@ -1,9 +1,13 @@
+#include "../../pixel.h"
 #include "../func.h"
 
 #define BOGOSORT {"Bogosort", &bogosort}
 
-void bogosort(uint8_t *buffer, int *numbers, int numbersSize){
+extern struct Pixel *p;
+
+void bogosort(int *numbers, int numbersSize){
     bool sorted = false;
+
     // if array isn't yet sorted
     while(!sorted){
         sorted = true;
@@ -13,12 +17,14 @@ void bogosort(uint8_t *buffer, int *numbers, int numbersSize){
                 sorted = false;
                 break;
             }
-            if(buffer != NULL){
-                ProcessEvents()
-                drawNumbers(i, i + 1);
-                update(buffer);
-                wait();
-            }
+
+            drawNumbers(i, i + 1);
+            pixelSetColor(p, 255, 0, 0, 255);
+            highlight(i);
+            highlight(i + 1);
+            PixelWait();
         }
     }
+
+    drawFinalAnimation(numbers, numbersSize);
 }

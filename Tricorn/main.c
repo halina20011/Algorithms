@@ -1,5 +1,3 @@
-// gcc main.c $(sdl2-config --cflags --libs) -lm -lpng -o Build/main && ./Build/main
-
 // Copyright (C) 2023  halina20011
 //
 // This program is free software: you can redistribute it and/or modify
@@ -15,12 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_render.h>
-
 #include <math.h>
 
-#include "../pixel.c"
+#include "../pixel.h"
 #include "../pngWrapper.c"
 
 #include "../gradient.h"
@@ -28,13 +23,6 @@
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
-
-const int WINDOWWIDTH = WINDOW_WIDTH;
-const int WINDOWHEIGHT = WINDOW_HEIGHT;
-
-SDL_Event event;
-SDL_Renderer *renderer;
-SDL_Window *window;
 
 float cenX = 0.0;
 float cenY = 0.0;
@@ -69,7 +57,7 @@ void calculatePoint(long double cx, long double cy, int *iterations, int *isIn){
     }
 }
 
-void mandelbrotSet(uint8_t **buffer, int width, int height){
+void tricorn(struct Pixel *p, int width, int height){
     long double px = 0.0; 
     long double py = 0.0;
 
@@ -97,57 +85,23 @@ void mandelbrotSet(uint8_t **buffer, int width, int height){
             // hsv2rgb(h, 100.0, v, &r, &g, &b);
             // }
 
-            *(*buffer + i + 0) = r;
-            *(*buffer + i + 1) = g;
-            *(*buffer + i + 2) = b;
-            *(*buffer + i + 3) = 255;
+            p->buffer[i + 0] = r;
+            p->buffer[i + 1] = g;
+            p->buffer[i + 2] = b;
+            p->buffer[i + 3] = 255;
         }
     }
 }
 
 int main(int argc, char **argv){
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
-        printf("Error initializing SDL: %s\n", SDL_GetError());
-    }
+    struct Pixel *p = pixelInit("Tricorn", WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    // Create a window and renderer
-    window = SDL_CreateWindow("Mandelbrot set", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    
-    uint8_t *buffer = NULL;
-    int r = newPixelBuffer(&buffer);
-    if(r){
-        printf("Error allocating memory for pixel buffer\n");
-        return 1;
-    }
+    tricorn(p, p->width, p->height);
+    pixelUpdate(p);
 
-    mandelbrotSet(&buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
-    update(buffer);
-    
-    int run = 1;
-    while(run){
-        while(SDL_PollEvent(&event)){
-            if(event.type == SDL_KEYDOWN){
-                SDL_Keycode key = event.key.keysym.sym;
-                if(key == SDLK_q || key == SDLK_ESCAPE){
-                    run = 0;
-                }
-                else if(key == SDLK_s){
-                    savePng("tricorn.png", buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
-                    printf("Image saved\n");
-                }
-            }
-            else if(event.type == SDL_QUIT){
-                run = 0;
-            }
-        }
-    }
+    pixelWaitExit(p);
 
-    free(buffer);
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    pixelFree(p);
 
     return 0;
 }

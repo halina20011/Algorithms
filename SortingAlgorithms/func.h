@@ -6,10 +6,11 @@
 // for time
 #include <time.h>
 
-#include "../pixel.c"
+#include "../pixel.h"
+
+extern struct Pixel *p;
 
 extern int numberWidth;
-extern uint8_t *buffer;
 extern int *numbers;
 extern int numbersSize;
 extern bool HIGHLIGHT;
@@ -90,57 +91,73 @@ void printArray(int *array, int arraySize){
     printf("\n");
 }
 
-void drawNumbers(int indexItem1, int indexItem2){
-    setColor(0, 0, 0, 255);
-    fillBuffer(buffer);
-    setColor(255, 255, 255, 255);
+void drawNumbers(){
+    pixelSetColor(p, 0, 0, 0, 255);
+    pixelFill(p);
+    pixelSetColor(p, 255, 255, 255, 255);
 
     for(int i = 0; i < numbersSize; i++){
         int x = i * numberWidth;
-        if(indexItem1 == i || indexItem2 == i){
-            setColor(255, 0, 0, 255);
-            drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
-            setColor(255, 255, 255, 255);
-        }
-        else{
-            drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
-        }
+        drawRectangle(p, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
     }
 }
 
-void highlight(int index){
-    if(0 <= index && index < numbersSize){
-        int x = index * numberWidth;
-        setColor(255, 0, 0, 255);
-        drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[index], numberWidth, numbers[index]);
-        setColor(255, 255, 255, 255);
+void highlight(int index) {\
+    if(index < 0 || numbersSize <= index){
+        return;
     }
+
+    uint8_t *curr = p->rgba;
+    uint8_t temp[4] = {0, 0, 0, 255};
+
+    int x = index * numberWidth;
+    p->rgba = temp;
+    drawRectangle(p, x, 0, numberWidth, WINDOW_HEIGHT);
+
+    p->rgba = curr;
+    drawRectangle(p, x, WINDOW_HEIGHT - numbers[index], numberWidth, numbers[index]);
 }
+
+void swapNumbers(int i, int j){
+    pixelSetColor(p, 0, 0, 255, 255);
+    highlight(i);
+    highlight(j);
+    PixelWait();
+
+    swap(numbers + i, numbers + j);
+    highlight(i);
+    highlight(j);
+    PixelWait();
+}
+
 
 void highlightRegion(int left, int right){
     if(!HIGHLIGHT)
         return;
-    setColor(0, 0, 255, 255);
+
+    pixelSetColor(p, 0, 0, 255, 255);
     const int end = (right < numbersSize) ? right : numbersSize;
     for(int i = left; i < end; i++){
         int x = i * numberWidth;
-        drawRectangle(&buffer, x, 0, numberWidth, WINDOW_HEIGHT - numbers[i]);
+        drawRectangle(p, x, 0, numberWidth, WINDOW_HEIGHT - numbers[i]);
     }
-    setColor(255, 255, 255, 255);
+    pixelSetColor(p, 255, 255, 255, 255);
 }
 
 void drawFinalAnimation(){
     drawNumbers(-1, -1);
-    setColor(0, 255, 0, 255);
+    pixelSetColor(p, 0, 255, 0, 255);
     for(int i = 0; i < numbersSize; i++){
         int x = i * numberWidth;
-        drawRectangle(&buffer, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
-        ProcessEvents();
-        update(buffer);
-        wait();
+        drawRectangle(p, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
+        PixelWait();
+        // if(pixelEvents(p) == PIXEL_EXIT){
+        //     return;
+        // }
+        // pixelWait(p);
     }
     
-    setColor(255, 255, 255, 255);
+    pixelSetColor(p, 255, 255, 255, 255);
 }
 
 #endif

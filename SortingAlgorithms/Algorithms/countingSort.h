@@ -1,8 +1,11 @@
+#include "../../pixel.h"
 #include "../func.h"
 
 #define COUNTINGSORT {"Counting Sort", &countingSort}
 
-void countingSort(uint8_t *buffer, int *numbers, int numbersSize){
+extern struct Pixel *p;
+
+void countingSort(int *numbers, int numbersSize){
     int min = INT_MAX, max = INT_MIN;
     int minIndex = 0, maxIndex = 0;
     for(int i = 0; i < numbersSize; i++){
@@ -14,42 +17,42 @@ void countingSort(uint8_t *buffer, int *numbers, int numbersSize){
             max = numbers[i];
             maxIndex = i;
         }
-        if(buffer != NULL){
-            ProcessEvents();
-            drawNumbers(i, i);
-            highlight(minIndex);
-            highlight(maxIndex);
-            update(buffer);
-            wait();
-        }
+
+        drawNumbers();
+        pixelSetColor(p, 255, 0, 0, 0);
+        highlight(i);
+        pixelSetColor(p, 255, 255, 0, 0);
+        highlight(minIndex);
+        highlight(maxIndex);
+        PixelWait();
     }
 
     int size = max - min + 1;
 
     int *count = calloc(size, sizeof(int));
     for(int i = 0; i < numbersSize; i++){
+        drawNumbers();
+        pixelSetColor(p, 255, 0, 0, 0);
+        highlight(i);
+        PixelWait();
+
         count[numbers[i] - min] += 1;
-        if(buffer != NULL){
-            ProcessEvents();
-            drawNumbers(i, i);
-            update(buffer);
-            wait();
-        }
     }
     
     int index = 0;
     for(int c = 0; c < size; c++){
         for(int i = 0; i < count[c]; i++){
+            drawNumbers();
+            pixelSetColor(p, 255, 0, 0, 0);
+            highlight(index);
+            PixelWait();
+
             numbers[index] = c + min;
-            if(buffer != NULL){
-                ProcessEvents();
-                drawNumbers(index, index);
-                update(buffer);
-                wait();
-            }
             index++;
         }
     }
 
     free(count);
+
+    drawFinalAnimation(numbers, numbersSize);
 }
