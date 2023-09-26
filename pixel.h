@@ -107,6 +107,30 @@ void pixelSetSpeed(struct Pixel *p, bool speed){
     }
 }
 
+#define ever ;;
+int waitFor(struct Pixel *p, SDL_Keycode code){
+    for(ever){
+        while(SDL_PollEvent(&p->event)){
+            if(p->event.type == SDL_KEYUP){
+                SDL_Keycode key = p->event.key.keysym.sym;
+                if(key == SDLK_q || key == SDLK_ESCAPE){
+                    p->run = false;
+                    return PIXEL_EXIT;
+                }
+                else if(key == code){
+                    return PIXEL_CONTINUE;
+                }
+            }
+            else if(p->event.type == SDL_QUIT){
+                p->run = false;
+                return PIXEL_EXIT;
+            }
+        }
+    }
+
+    return PIXEL_CONTINUE;
+}
+
 int pixelEvents(struct Pixel *p){
     while(SDL_PollEvent(&p->event)){
         if(p->event.type == SDL_KEYDOWN){
@@ -153,6 +177,9 @@ int pixelEvents(struct Pixel *p){
                 if(p->sleepIndex < sleepTableSize - 1){
                     pixelSetIndexSpeed(p, p->sleepIndex + 1);
                 }
+            }
+            else if(key == SDLK_SPACE){
+                return waitFor(p, SDLK_SPACE);
             }
         }
         else if(p->event.type == SDL_QUIT){

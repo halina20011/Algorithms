@@ -1,7 +1,9 @@
 # TODO
-toggle animation pause/play </br>
-show swaps with different color </br>
+when capture on pipe the frames into ffmpeg </br>
+? alternate screen </br>
 
+Block sort </br>
+Cycle sort </br>
 Quicksort </br>
 Binary Radix Sort </br>
 Bucket Sort </br>
