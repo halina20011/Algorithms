@@ -145,19 +145,13 @@ void highlightRegion(int left, int right){
 }
 
 void drawFinalAnimation(){
-    drawNumbers(-1, -1);
+    drawNumbers();
     pixelSetColor(p, 0, 255, 0, 255);
     for(int i = 0; i < numbersSize; i++){
         int x = i * numberWidth;
         drawRectangle(p, x, WINDOW_HEIGHT - numbers[i], numberWidth, numbers[i]);
         PixelWait();
-        // if(pixelEvents(p) == PIXEL_EXIT){
-        //     return;
-        // }
-        // pixelWait(p);
     }
-    
-    pixelSetColor(p, 255, 255, 255, 255);
 }
 
 #endif

@@ -66,18 +66,22 @@ struct Algorithm{
 #include "Algorithms/cocktailSort.h"
 #include "Algorithms/gnomeSort.h"
 #include "Algorithms/combSort.h"
+#include "Algorithms/circleSort.h"
+#include "Algorithms/cycleSort.h"
 
+#include "Algorithms/countingSort.h"
 #include "Algorithms/radixSort.h"
+
 #include "Algorithms/heapsort.h"
 #include "Algorithms/mergeSort.h"
-#include "Algorithms/countingSort.h"
+#include "Algorithms/quickSort.h"
 
 #include "Algorithms/stoogeSort.h"
 #include "Algorithms/bogosort.h"
 #include "Algorithms/slowsort.h"
 
 struct Algorithm algorithms[] = {
-    BUBBLESORT, INSERTIONSORT, SELECTIONSORT, ODDEVENSORT, COCKTAILSORT, COMBSORT, GNOMESORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE, COUNTINGSORT, STOOGESORT, BOGOSORT, SLOWSORT
+    BUBBLESORT, INSERTIONSORT, SELECTIONSORT, ODDEVENSORT, COCKTAILSORT, COMBSORT, CIRCLESORT, CYCLESORT, GNOMESORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE, QUICKSORTLOMUTO, QUICKSORTHOARE, COUNTINGSORT, STOOGESORT, BOGOSORT, SLOWSORT
 };
 
 int sortingAlgorithmsLength = sizeof(algorithms) / sizeof(algorithms[0]);

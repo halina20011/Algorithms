@@ -150,7 +150,7 @@ int pixelEvents(struct Pixel *p){
 
                 file = fopen(fileName, "w");
                 if(file == NULL){
-                    fprintf(stderr, "file \"%s\" couldn't be opened\n");
+                    fprintf(stderr, "file \"%s\" couldn't be opened\n", fileName);
                 }
                 else{
                     fwrite(p->buffer, sizeof(uint8_t), p->size, file);
@@ -256,7 +256,7 @@ void pixelUpdate(struct Pixel *p){
 } \
 
 void pixelClear(struct Pixel *p){
-    for(int i = 0; i < p->size; i++){
+    for(size_t i = 0; i < p->size; i++){
         p->buffer[i] = 0;
     }
 }
