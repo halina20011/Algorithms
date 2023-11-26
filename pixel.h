@@ -275,7 +275,7 @@ void pixelFill(struct Pixel *p){
 }
 
 void pixelDraw(struct Pixel *p, int x, int y){
-    if(x < 0 || p->width <= x || y < 0 || p->height <= y){
+    if(x < 0 || (int)p->width <= x || y < 0 || (int)p->height <= y){
         return;
     }
 

@@ -17,6 +17,7 @@
 #define GRAPH
 
 #include <stdlib.h>
+#include <math.h>
 
 struct Vertex{
     int x, y;
@@ -44,6 +45,37 @@ struct Edge *edgeInit(struct Vertex *a, struct Vertex *b){
     e->b = vertexCopy(b);
 
     return e;
+}
+
+struct Connection{
+    int a, b;
+    int pointsSize;
+};
+
+struct Connection *connectionInit(struct Vertex **vertices, size_t a, size_t b){
+    struct Connection *connection = malloc(sizeof(struct Connection));
+    connection->a = a;
+    connection->b = b;
+    connection->pointsSize = pow(vertices[b]->x - vertices[a]->x, 2) + pow(vertices[b]->y - vertices[a]->y, 2);
+
+    return connection;
+}
+
+struct Connection **generateConnections(struct Vertex **vertices, size_t verticesSize, size_t *connSize){
+    // n 
+    // full adjacency matrix has n^2
+    // for undirected graph without any vertices connected to itself
+    // we can use pointsSize = n ^ 2 / 2 - n / 2 = > (n * (n - 1)) / 2
+    *connSize = (verticesSize * (verticesSize - 1)) / 2;
+    struct Connection **connections = malloc(sizeof(struct Connection*) * (*connSize));
+    size_t index = 0;
+    for(size_t y = 1; y < verticesSize; y++){
+        for(size_t x = 0; x < y; x++){
+            connections[index++] = connectionInit(vertices, y, x);
+        }
+    }
+
+    return connections;
 }
 
 #endif

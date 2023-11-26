@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 #include "../pixel.h"
-#include "./graph.h"
+#include "./graph.c"
 
 extern struct Pixel *p;
 

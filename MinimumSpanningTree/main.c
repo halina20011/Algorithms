@@ -16,7 +16,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // TODO: boruvka's algorithm 
-// TODO: prim's algorithm
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,9 +28,10 @@
 #include <math.h>
 #include <stdbool.h>
 
-#include "./graph.h"
+#include "./graph.c"
 
 #include "./kruskal.c"
+#include "./prims.c"
 
 struct Pixel *p = NULL;
 
@@ -57,11 +57,15 @@ void freeVertices(struct Vertex **vertices, size_t size){
 
 int main(){
     p = pixelInit("minimum spanning tree", 600, 600);
+    pixelSetIndexSpeed(p, 1);
     
     const size_t verticesSize = 50;
     struct Vertex **vertices = randomVertices(p->width, p->height, verticesSize);
     
     kruskalsAlgorithm(vertices, verticesSize);
+    p->run = true;
+
+    primsAlgorithm(vertices, verticesSize);
     
     freeVertices(vertices, verticesSize);
 

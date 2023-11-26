@@ -18,8 +18,9 @@
 
 #include <stdlib.h>
 #include <inttypes.h>
+#include <stdio.h>
 
-#include "./graph.h"
+#include "./graph.c"
 
 struct DisjointUnion{
     uint32_t *parents;
@@ -51,7 +52,7 @@ void disjointUnionFree(struct DisjointUnion *u){
     free(u);
 }
 
-int disjointUnionFind(struct DisjointUnion *u, int n){
+int disjointUnionFind(struct DisjointUnion *u, uint32_t n){
     while(n != u->parents[n]){
         u->parents[n] = u->parents[u->parents[n]];
         n = u->parents[n];

@@ -19,20 +19,15 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-#include "./graph.h"
+#include "./graph.c"
 
-#include "./unionFind.h"
-#include "./vector.h"
+#include "./unionFind.c"
+#include "./vector.c"
 
 #include "../pixel.h"
-#include "./graphDraw.h"
+#include "./graphDraw.c"
 
 extern struct Pixel *p;
-
-struct Connection{
-    int a, b;
-    int pointsSize;
-};
 
 int comp(const void *a, const void *b){
     const int x = (*(struct Connection**)a)->pointsSize;
@@ -47,21 +42,8 @@ void kruskalsAlgorithm(struct Vertex **points, size_t pointsSize){
     struct DisjointUnion *u;
     disjointUnionInit(&u, pointsSize);
 
-    // n 
-    // full adjacency matrix has n^2
-    // for undirected graph without any vertices connected to itself
-    // we can use pointsSize = n ^ 2 / 2 - n / 2
-    size_t conSize = (pointsSize * pointsSize) / 2 - (pointsSize / 2);
-    struct Connection **c = malloc(sizeof(struct Connection) * conSize);
-    size_t index = 0;
-    for(size_t i = 1; i < pointsSize; i++){
-        for(size_t j = 0; j < i; j++){
-            c[index] = malloc(sizeof(struct Connection));
-            c[index]->a = i;
-            c[index]->b = j;
-            c[index++]->pointsSize = pow(points[i]->x - points[j]->x, 2) + pow(points[i]->y - points[j]->y, 2);
-        }
-    }
+    size_t conSize = 0;
+    struct Connection **c = generateConnections(points, pointsSize, &conSize);
 
     qsort(c, conSize, sizeof(struct Connection*), comp);
     
