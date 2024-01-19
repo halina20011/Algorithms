@@ -13,20 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PRIMS
-#define PRIMS
-
-#include <stdbool.h>
-#include <math.h>
-#include <sys/types.h>
-
-#include "graph.c"
-#include "./vector.c"
-
-#include "../pixel.h"
-#include "./graphDraw.c"
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void heapify(struct Connection **arr, size_t size, int node){
     const int left = 2 * node + 1;
@@ -145,5 +132,3 @@ void primsAlgorithm(struct Vertex **vertices, size_t verticesSize){
 
     vectorFree(v);
 }
-
-#endif

@@ -13,28 +13,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "vector.h"
+#ifndef VECTOR
+#define VECTOR
 
-void vectorInit(struct Vector **v){
-    *v = malloc(sizeof(struct Vector));
-    (*v)->maxSize = 20;
-    (*v)->size = 0;
-    (*v)->val = malloc(sizeof(void*) * (*v)->maxSize);
-}
+#include <stdlib.h>
+#include <inttypes.h>
 
-void vectorPush(struct Vector *v, void *val){
-    if(v->maxSize <= v->size){
-        v->maxSize *= 2;
-        v->val = realloc(v->val, sizeof(void*) * v->maxSize);
-    }
+struct Vector{
+    void **val;
+    size_t maxSize;
+    size_t size;
+};
 
-    v->val[v->size++] = val;
-}
+void vectorInit(struct Vector **v);
 
-void vectorFree(struct Vector *v){
-    for(size_t i = 0; i < v->size; i++){
-        free(v->val[i]);
-    }
+void vectorPush(struct Vector *v, void *val);
 
-    free(v);
-}
+void vectorFree(struct Vector *v);
+
+#endif

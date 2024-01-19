@@ -13,28 +13,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "vector.h"
+#ifndef GRAPHDRAW
+#define GRAPHDRAW
 
-void vectorInit(struct Vector **v){
-    *v = malloc(sizeof(struct Vector));
-    (*v)->maxSize = 20;
-    (*v)->size = 0;
-    (*v)->val = malloc(sizeof(void*) * (*v)->maxSize);
-}
+#include <stdlib.h>
 
-void vectorPush(struct Vector *v, void *val){
-    if(v->maxSize <= v->size){
-        v->maxSize *= 2;
-        v->val = realloc(v->val, sizeof(void*) * v->maxSize);
-    }
+#include "../pixel.h"
+#include "./graph.h"
 
-    v->val[v->size++] = val;
-}
+extern struct Pixel *p;
 
-void vectorFree(struct Vector *v){
-    for(size_t i = 0; i < v->size; i++){
-        free(v->val[i]);
-    }
+void drawVertex(struct Vertex *v);
 
-    free(v);
-}
+void drawEdge(struct Edge *e);
+
+void drawGraph(struct Vertex **verticies, const size_t vertexSize, struct Edge **edges, const size_t edgesSize);
+
+#endif

@@ -1,9 +1,4 @@
-#include "../../pixel.h"
-#include "../func.h"
-
-#define GNOMESORT {"Gnome Sort", &gnomeSort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void gnomeSort(int *numbers, int numbersSize){
     int i = 0;
@@ -23,6 +18,4 @@ void gnomeSort(int *numbers, int numbersSize){
             i--;
         }
     }
-
-    drawFinalAnimation(numbers, numbersSize);
 }

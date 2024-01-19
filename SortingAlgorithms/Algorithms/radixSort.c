@@ -1,12 +1,4 @@
-#include <limits.h>
-
-#include "../../pixel.h"
-#include "../func.h"
-#include "../singleLinkedList.h"
-
-#define RADIXSORT {"Radix Sort", &radixSort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void radixSort(int *numbers, int numbersSize){
     int minIndex = 0;
@@ -26,11 +18,9 @@ void radixSort(int *numbers, int numbersSize){
     const int max = numbers[minIndex];
 
     // make lookup table
-    struct Node **heads = malloc(sizeof(struct Node*) * 10);
-    struct Node **tails = malloc(sizeof(struct Node*) * 10);
+    struct List **list = malloc(sizeof(struct List*) * 10);
     for(int i = 0; i < 10; i++){
-        heads[i] = NULL;
-        tails[i] = NULL;
+        list[i] = newSinglyLinkedList();
     }
 
     for(int d = 1; max / d > 0; d *= 10){
@@ -38,7 +28,7 @@ void radixSort(int *numbers, int numbersSize){
             // nth digit = (N // 10^(D-n)) % 10
             // extract digit that will be used as a key
             int n = ((int)(numbers[i] / d)) % 10;
-            add(heads + n, tails + n, numbers[i]);
+            listPushConvert(list[n], int, numbers[i]);
             
             drawNumbers();
             pixelSetColor(p, 255, 0, 0, 255);
@@ -49,7 +39,7 @@ void radixSort(int *numbers, int numbersSize){
         int pIndex = 0;
 
         for(int n = 0; n < 10; n++){
-            struct Node *curr = heads[n], *temp = NULL;
+            struct Node *curr = list[n]->head, *temp = NULL;
             while(curr){
                 temp = curr;
                 curr = curr->next;
@@ -58,22 +48,16 @@ void radixSort(int *numbers, int numbersSize){
                 highlight(pIndex);
                 PixelWait();
 
-                numbers[pIndex++] = temp->data;
-                free(temp);
+                numbers[pIndex++] = *(int*)temp->val;
             }
 
-            heads[n] = NULL;
-            tails[n] = NULL;
+            singlyLinkedListClear(list[n], true);
         }
     }
 
     for(int i = 0; i < 10; i++){
-        free(heads[i]);
-        free(tails[i]);
+        freeSinglyLinkedList(list[i], true);
     }
 
-    free(heads);
-    free(tails);
-
-    drawFinalAnimation(numbers, numbersSize);
+    free(list);
 }

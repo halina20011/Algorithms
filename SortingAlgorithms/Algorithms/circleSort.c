@@ -1,9 +1,4 @@
-#include <stdbool.h>
-
-#include "../../pixel.h"
-#include "../func.h"
-
-#define CIRCLESORT {"Circle Sort", &circleSort}
+#include "algorithms.h"
 
 bool halver(int *numbers, int left, int right){
     bool swapped = false;

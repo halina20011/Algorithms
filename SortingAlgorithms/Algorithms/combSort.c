@@ -1,7 +1,4 @@
-#include <stdbool.h>
-
-#include "../../pixel.h"
-#include "../func.h"
+#include "algorithms.h"
 
 #define COMBSORT {"Comb sort", &combSort}
 

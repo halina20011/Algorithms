@@ -13,28 +13,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "vector.h"
+#ifndef UNIONFIND
+#define UNIONFIND
 
-void vectorInit(struct Vector **v){
-    *v = malloc(sizeof(struct Vector));
-    (*v)->maxSize = 20;
-    (*v)->size = 0;
-    (*v)->val = malloc(sizeof(void*) * (*v)->maxSize);
-}
+#include <stdio.h>
+#include <stdlib.h>
+#include <inttypes.h>
 
-void vectorPush(struct Vector *v, void *val){
-    if(v->maxSize <= v->size){
-        v->maxSize *= 2;
-        v->val = realloc(v->val, sizeof(void*) * v->maxSize);
-    }
+#include "./graph.h"
 
-    v->val[v->size++] = val;
-}
+struct DisjointUnion{
+    uint32_t *parents;
+    size_t *ranks;
+    size_t size;
+};
 
-void vectorFree(struct Vector *v){
-    for(size_t i = 0; i < v->size; i++){
-        free(v->val[i]);
-    }
+void disjointUnionInit(struct DisjointUnion **u, size_t size);
 
-    free(v);
-}
+void disjointUnionPrint(struct DisjointUnion *u);
+
+
+void disjointUnionFree(struct DisjointUnion *u);
+
+int disjointUnionFind(struct DisjointUnion *u, uint32_t n);
+
+void disjointUnionUnion(struct DisjointUnion *u, int a, int b);
+
+#endif

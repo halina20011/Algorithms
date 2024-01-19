@@ -1,9 +1,4 @@
-#include "../func.h"
-#include "../../pixel.h"
-
-#define SELECTIONSORT {"Selection Sort", &selectionSort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void selectionSort(int *numbers, int numbersSize){
     int minIndex = 0;
@@ -31,6 +26,4 @@ void selectionSort(int *numbers, int numbersSize){
             swapNumbers(minIndex, i);
         }
     }
-
-    drawFinalAnimation(numbers, numbersSize);
 }

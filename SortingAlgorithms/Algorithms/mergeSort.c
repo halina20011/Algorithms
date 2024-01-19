@@ -1,19 +1,10 @@
-#include <stdbool.h>
-#include <stdio.h>
-
-#include "../../pixel.h"
-#include "../func.h"
-
-#define MERGESORT {"Merge Sort", mergeSortSpace}
-#define MERGESORTNOSPACE {"Merge Sort, O(1) space", mergeSortNoSpace}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 int min(int a, int b){
     return (a < b) ? a : b;
 }
 
-void merge(int *numbers, int numbersSize, int from, int mid, int right){
+void merge(int *numbers, int from, int mid, int right){
     int i = from;
     int j = mid;
     while(i < mid && j < right){
@@ -44,7 +35,7 @@ void merge(int *numbers, int numbersSize, int from, int mid, int right){
     }
 }
 
-void mergeWithSpace(int *numbers, int numbersSize, int *temp, int left, int mid, int right){
+void mergeWithSpace(int *numbers, int *temp, int left, int mid, int right){
     int i = left;
     int j = mid;
     int tSize = 0;
@@ -108,17 +99,16 @@ void mergeSort(int *numbers, int numbersSize, bool space){
 
             if(mid < right){
                 if(space){
-                    mergeWithSpace(numbers, numbersSize, temp, left, mid, right);
+                    mergeWithSpace(numbers, temp, left, mid, right);
                 }
                 else{
-                    merge(numbers, numbersSize, left, mid, right);
+                    merge(numbers, left, mid, right);
                 }
             }
         }
     }
 
     free(temp);
-    drawFinalAnimation(numbers, numbersSize);
 }
 
 void mergeSortSpace(int *numbers, int numbersSize){

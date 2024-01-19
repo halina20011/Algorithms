@@ -13,15 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef GRAPHDRAW
-#define GRAPHDRAW
-
-#include <stdlib.h>
-
-#include "../pixel.h"
-#include "./graph.c"
-
-extern struct Pixel *p;
+#include "graphDraw.h"
 
 void drawVertex(struct Vertex *v){
     drawCircle(p, v->x, v->y, 5);
@@ -47,5 +39,3 @@ void drawGraph(struct Vertex **verticies, const size_t vertexSize, struct Edge *
 
     pixelUpdate(p);
 }
-
-#endif

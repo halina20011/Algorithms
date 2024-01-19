@@ -21,17 +21,16 @@
 #include <stdlib.h>
 
 #include "../pixel.h"
-#include "../pngWrapper.c"
+// #include "../pngWrapper.c"
 
 // for time() and clock()
 #include <time.h>
 #include <math.h>
 #include <stdbool.h>
 
-#include "./graph.c"
+#include "./graph.h"
 
-#include "./kruskal.c"
-#include "./prims.c"
+#include "./algorithms.h"
 
 struct Pixel *p = NULL;
 

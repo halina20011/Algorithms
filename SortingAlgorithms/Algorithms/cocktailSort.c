@@ -1,11 +1,4 @@
-#include <stdbool.h>
-
-#include "../../pixel.h"
-#include "../func.h"
-
-#define COCKTAILSORT {"Cocktail Sort", &cocktailSort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void cocktailSort(int *numbers, int numbersSize){
     bool sorted = false;
@@ -48,6 +41,4 @@ void cocktailSort(int *numbers, int numbersSize){
 
 		start++;
 	}
-
-    drawFinalAnimation(numbers, numbersSize);
 }

@@ -5,4 +5,4 @@
 `mkdir Build` </br>
 
 ## Build and run
-`./build.sh && ./Build/main` </br>
+`make main && ./Build/main` </br>

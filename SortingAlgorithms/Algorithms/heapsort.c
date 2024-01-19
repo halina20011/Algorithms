@@ -1,11 +1,4 @@
-#include <stdbool.h>
-
-#include "../../pixel.h"
-#include "../func.h"
-
-#define HEAPSORT {"Heapsort", &heapsort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void maxHeapify(int *heap, int heapSize, int node){
     int leftChild = 2 * node + 1;
@@ -49,6 +42,4 @@ void heapsort(int *numbers, int numbersSize){
         swapNumbers(0, --heapSize);
         maxHeapify(numbers, heapSize, 0);
     }
-
-    drawFinalAnimation(numbers, numbersSize);
 }

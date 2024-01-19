@@ -1,9 +1,4 @@
-#include "../func.h"
-#include "../../pixel.h"
-
-#define INSERTIONSORT {"Insertion Sort", &insertionSort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void insertionSort(int *numbers, int numbersSize){
     for(int i = 1; i < numbersSize; i++){
@@ -24,6 +19,4 @@ void insertionSort(int *numbers, int numbersSize){
             }
         }
     }
-
-    drawFinalAnimation(numbers, numbersSize);
 }

@@ -32,8 +32,8 @@ void mainLoop(struct Pixel *p){
     unsigned seed = time(NULL);
     srand(seed);
 
-    for(int y = 0; y < p->height; y++){
-        for(int x = 0; x < p->width; x++){
+    for(size_t y = 0; y < p->height; y++){
+        for(size_t x = 0; x < p->width; x++){
             int i = 4 * (y * p->width + x);
             p->buffer[i + 0] = rand() % 255 + 1;
             p->buffer[i + 1] = rand() % 255 + 1;

@@ -1,6 +1,3 @@
-// gcc main.c $(sdl2-config --cflags --libs) -lm -lpng -o Build/main && ./Build/main [indexAnimation]
-// ./build.sh && ./Build/main [indexAnimation]
-
 // Copyright (C) 2023  halina20011
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,20 +21,20 @@
 #include <inttypes.h>
 #include <math.h>
 
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+
 // #define CAPTURE_ON true
 #include "../pixel.h"
 #include "../pngWrapper.c"
-
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
 
 struct Pixel *p = NULL;
 
 int *availableSizes = NULL;
 int availableSizesSize;
 
-int *numbers = NULL;
-int numbersSize = -1;
+int *arr = NULL;
+int arrSize = -1;
 
 int numberWidth = 0;
 
@@ -56,29 +53,10 @@ struct Algorithm{
 };
 
 #include "func.h"
-#include "singleLinkedList.h"
+#include "singlyLinkedList.h"
 
 // include all sorting algorithms 
-#include "Algorithms/bubbleSort.h"
-#include "Algorithms/insertionSort.h"
-#include "Algorithms/selectionSort.h"
-#include "Algorithms/oddevenSort.h"
-#include "Algorithms/cocktailSort.h"
-#include "Algorithms/gnomeSort.h"
-#include "Algorithms/combSort.h"
-#include "Algorithms/circleSort.h"
-#include "Algorithms/cycleSort.h"
-
-#include "Algorithms/countingSort.h"
-#include "Algorithms/radixSort.h"
-
-#include "Algorithms/heapsort.h"
-#include "Algorithms/mergeSort.h"
-#include "Algorithms/quickSort.h"
-
-#include "Algorithms/stoogeSort.h"
-#include "Algorithms/bogosort.h"
-#include "Algorithms/slowsort.h"
+#include "Algorithms/algorithms.h"
 
 struct Algorithm algorithms[] = {
     BUBBLESORT, INSERTIONSORT, SELECTIONSORT, ODDEVENSORT, COCKTAILSORT, COMBSORT, CIRCLESORT, CYCLESORT, GNOMESORT, RADIXSORT, HEAPSORT, MERGESORT, MERGESORTNOSPACE, QUICKSORTLOMUTO, QUICKSORTHOARE, COUNTINGSORT, STOOGESORT, BOGOSORT, SLOWSORT
@@ -133,12 +111,11 @@ void showAlgorithms(){
     }
 }
 
-int parseInput(char *input, int **array, int *arraySize){
+int *parseInput(char *input, int *arraySize){
     char *iPtr = input;
 
     int size = 0;
-    struct Node *head = NULL;
-    struct Node *tail = NULL;
+    struct List *list = newSinglyLinkedList();
 
     int n = 0;
     int numberToParse = false;
@@ -152,7 +129,7 @@ int parseInput(char *input, int **array, int *arraySize){
 
         if(!isdigit(*iPtr) || *(iPtr + 1) == '\0'){
             if(numberToParse){
-                add(&head, &tail, n);
+                listPush(list, &n);
                 size++;
                 n = 0;
                 numberToParse = false;
@@ -160,25 +137,28 @@ int parseInput(char *input, int **array, int *arraySize){
         }
         iPtr++;
     }
-    *array = malloc(sizeof(int) * size);
+
+    int *array = malloc(sizeof(int) * size);
     *arraySize = size;
 
-    for(int i = 0; head; i++){
-        (*array)[i] = deleteFirst(&head);
-    }
-    
-    if(searchInArray(availableSizes, availableSizesSize, size) == -1){
-        fprintf(stderr, "sorry but size '%i' of custom input is unvailable, run '-ls' to show all available sizes\n", size);
-        return 1;
+    struct Node *curr = list->head;
+    for(int i = 0; curr; i++){
+        array[i] = *(int*)curr->val;
+        curr = curr->next;
     }
 
-    return 0;
+    if(searchInArray(availableSizes, availableSizesSize, size) == -1){
+        fprintf(stderr, "sorry but size '%i' of custom input is unvailable, run '-ls' to show all available sizes\n", size);
+        exit(1);
+    }
+
+    return array;
 }
 
 int main(int argc, char **argv){
     bool shuffle = true;
     bool customInput = false;
-    numbersSize = -1;
+    arrSize = -1;
     int runAlgorithmIndex = -1;
     int initialSpeed = -1;
     if(argc == 1){
@@ -222,11 +202,11 @@ int main(int argc, char **argv){
                 fprintf(stderr, "missing option after flag '%s'\n", flag);
                 return 1;
             }
-            if(!sscanf(argv[i + 1], "%i", &numbersSize)){
-                fprintf(stderr, "invalid numbers size\n");
+            if(!sscanf(argv[i + 1], "%i", &arrSize)){
+                fprintf(stderr, "invalid arr size\n");
                 return 1;
             }
-            if(searchInArray(availableSizes, availableSizesSize, numbersSize) == -1){
+            if(searchInArray(availableSizes, availableSizesSize, arrSize) == -1){
                 fprintf(stderr, "this size is unvailable run '-ls' to show all available sizes\n");
                 return 1;
             }
@@ -239,10 +219,7 @@ int main(int argc, char **argv){
             }
             customInput = true;
             shuffle = false;
-            if(parseInput(argv[i + 1], &numbers, &numbersSize)){
-                fprintf(stderr, "failed parsing of the input\n");
-                return 0;
-            }
+            arr = parseInput(argv[i + 1], &arrSize);
             i++;
         }
         else if(strcmp(flag, "-N") == 0){
@@ -251,10 +228,7 @@ int main(int argc, char **argv){
                 return 1;
             }
             customInput = true;
-            if(parseInput(argv[i + 1], &numbers, &numbersSize)){
-                fprintf(stderr, "failed parsing of the input\n");
-                return 0;
-            }
+            arr = parseInput(argv[i + 1], &arrSize);
             i++;
         }
         else if(strcmp(flag, "-r") == 0){
@@ -278,32 +252,32 @@ int main(int argc, char **argv){
     }
 
     if(!customInput){
-        if(numbersSize <= 0){
-            numbersSize = 100;
+        if(arrSize <= 0){
+            arrSize = 100;
         }
-        numbers = malloc(sizeof(int) * numbersSize);
-        if(numbers == NULL){
-            fprintf(stderr, "error allocating memory for numbers buffer\n");
+        arr = malloc(sizeof(int) * arrSize);
+        if(arr == NULL){
+            fprintf(stderr, "error allocating memory for arr buffer\n");
             return 1;
         }
-        for(int i = 0; i < numbersSize; i++){
-            numbers[i] = i + 1;
+        for(int i = 0; i < arrSize; i++){
+            arr[i] = i + 1;
         }
     }
 
     if(shuffle){
-        shuffleArray(numbers, numbersSize);
+        shuffleArray(arr, arrSize);
     }
 
     int max = 0;
-    for(int i = 0; i < numbersSize; i++){
-        max = (max < numbers[i]) ? numbers[i] : max;
+    for(int i = 0; i < arrSize; i++){
+        max = (max < arr[i]) ? arr[i] : max;
     }
     
-    numberWidth = WINDOW_WIDTH / numbersSize;
+    numberWidth = WINDOW_WIDTH / arrSize;
 
     const double increase = (double)WINDOW_HEIGHT / (double)max;
-    fillArray(numbers, numbersSize, increase);
+    fillArray(arr, arrSize, increase);
 
     printf("algorithm: \"%s\"\n", algorithms[runAlgorithmIndex].name);
 
@@ -313,19 +287,15 @@ int main(int argc, char **argv){
         pixelSetSpeed(p, initialSpeed);
     }
 
-    const void (*algorithm)(int *numbers, int numbersSize) = algorithms[runAlgorithmIndex].algorithm;
-
-    // int *numbersCopy = malloc(sizeof(int) * numbersSize);
-    // memcpy(numbersCopy, numbers, sizeof(int) * numbersSize);
-    // algorithm(NULL, numbersCopy);
-    // printArray(numbersCopy, );
-    // free(numbersCopy);
+    void (*algorithm)(int *arr, int arrSize) = algorithms[runAlgorithmIndex].algorithm;
     
-    algorithm(numbers, numbersSize);
+    algorithm(arr, arrSize);
+
+    drawFinalAnimation(arr, arrSize);
 
     pixelWaitExit(p);
     
-    free(numbers);
+    free(arr);
     pixelFree(p);
 
     return 0;

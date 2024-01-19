@@ -1,14 +1,9 @@
-#include <stdbool.h>
-
-#include "../../pixel.h"
-#include "../func.h"
-
-#define CYCLESORT {"Cycle Sort", &cycleSort}
+#include "algorithms.h"
 
 void move(int *numbers, int size, int *position){
     int pos = *position;
-    int org = pos;
     int item = numbers[pos];
+
     for(int i = *position + 1; i < size; i++){
         drawNumbers();
         pixelSetColor(p, 255, 0, 0, 255);
@@ -28,7 +23,7 @@ void move(int *numbers, int size, int *position){
     *position = pos;
 }
 
-void skipDup(int *numbers, int size, int *position){
+void skipDup(int *numbers, int *position){
     while(numbers[*position] == numbers[*position + 1]){
         drawNumbers();
         pixelSetColor(p, 255, 0, 0, 255);
@@ -52,7 +47,7 @@ void cycleSort(int *numbers, int size){
         if(position == i){
             continue;
         }
-        skipDup(numbers, size, &position);
+        skipDup(numbers, &position);
 
         if(position != i){
             drawNumbers();
@@ -66,7 +61,7 @@ void cycleSort(int *numbers, int size){
         while(position != i){
             position = i;
             move(numbers, size, &position);
-            skipDup(numbers, size, &position);
+            skipDup(numbers, &position);
             if(item != numbers[position]){
                 drawNumbers();
                 pixelSetColor(p, 255, 0, 0, 255);

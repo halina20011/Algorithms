@@ -1,11 +1,4 @@
-#include <stdbool.h>
-
-#include "../../pixel.h"
-#include "../func.h"
-
-#define ODDEVENSORT {"Odd-even Sort", &oddevenSort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void oddevenSort(int *numbers, int numbersSize){
     bool sorted = false;
@@ -33,6 +26,4 @@ void oddevenSort(int *numbers, int numbersSize){
             }
         }
     }
-
-    drawFinalAnimation(numbers, numbersSize);
 }

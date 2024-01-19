@@ -1,9 +1,4 @@
-#include "../../pixel.h"
-#include "../func.h"
-
-#define BOGOSORT {"Bogosort", &bogosort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void bogosort(int *numbers, int numbersSize){
     bool sorted = false;
@@ -25,6 +20,4 @@ void bogosort(int *numbers, int numbersSize){
             PixelWait();
         }
     }
-
-    drawFinalAnimation(numbers, numbersSize);
 }

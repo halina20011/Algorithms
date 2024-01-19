@@ -13,28 +13,31 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "vector.h"
+#ifndef GRAPH
+#define GRAPH
 
-void vectorInit(struct Vector **v){
-    *v = malloc(sizeof(struct Vector));
-    (*v)->maxSize = 20;
-    (*v)->size = 0;
-    (*v)->val = malloc(sizeof(void*) * (*v)->maxSize);
-}
+#include <stdlib.h>
+#include <math.h>
 
-void vectorPush(struct Vector *v, void *val){
-    if(v->maxSize <= v->size){
-        v->maxSize *= 2;
-        v->val = realloc(v->val, sizeof(void*) * v->maxSize);
-    }
+struct Vertex{
+    int x, y;
+};
 
-    v->val[v->size++] = val;
-}
+struct Vertex *vertexInit(int x, int y);
+struct Vertex *vertexCopy(struct Vertex *v);
 
-void vectorFree(struct Vector *v){
-    for(size_t i = 0; i < v->size; i++){
-        free(v->val[i]);
-    }
+struct Edge{
+    struct Vertex *a, *b;
+};
 
-    free(v);
-}
+struct Edge *edgeInit(struct Vertex *a, struct Vertex *b);
+
+struct Connection{
+    int a, b;
+    int pointsSize;
+};
+
+struct Connection *connectionInit(struct Vertex **vertices, size_t a, size_t b);
+struct Connection **generateConnections(struct Vertex **vertices, size_t verticesSize, size_t *connSize);
+
+#endif

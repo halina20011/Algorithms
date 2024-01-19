@@ -13,15 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef GRAPH
-#define GRAPH
-
-#include <stdlib.h>
-#include <math.h>
-
-struct Vertex{
-    int x, y;
-};
+#include "graph.h"
 
 struct Vertex *vertexInit(int x, int y){
     struct Vertex *v = malloc(sizeof(struct Vertex));
@@ -35,10 +27,6 @@ struct Vertex *vertexCopy(struct Vertex *v){
     return vertexInit(v->x, v->y);
 }
 
-struct Edge{
-    struct Vertex *a, *b;
-};
-
 struct Edge *edgeInit(struct Vertex *a, struct Vertex *b){
     struct Edge *e = malloc(sizeof(struct Edge));
     e->a = vertexCopy(a);
@@ -46,11 +34,6 @@ struct Edge *edgeInit(struct Vertex *a, struct Vertex *b){
 
     return e;
 }
-
-struct Connection{
-    int a, b;
-    int pointsSize;
-};
 
 struct Connection *connectionInit(struct Vertex **vertices, size_t a, size_t b){
     struct Connection *connection = malloc(sizeof(struct Connection));
@@ -77,5 +60,3 @@ struct Connection **generateConnections(struct Vertex **vertices, size_t vertice
 
     return connections;
 }
-
-#endif

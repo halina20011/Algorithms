@@ -13,20 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef UNIONFIND
-#define UNIONFIND
-
-#include <stdlib.h>
-#include <inttypes.h>
-#include <stdio.h>
-
-#include "./graph.c"
-
-struct DisjointUnion{
-    uint32_t *parents;
-    size_t *ranks;
-    size_t size;
-};
+#include "unionFind.h"
 
 void disjointUnionInit(struct DisjointUnion **u, size_t size){
     *u = malloc(sizeof(struct DisjointUnion));
@@ -79,5 +66,3 @@ void disjointUnionUnion(struct DisjointUnion *u, int a, int b){
         u->ranks[parentA] = newRank;
     }
 }
-
-#endif

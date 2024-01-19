@@ -1,11 +1,4 @@
-#include <stdbool.h>
-
-#include "../../pixel.h"
-#include "../func.h"
-
-#define BUBBLESORT {"Bubble Sort", &bubbleSort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void bubbleSort(int *numbers, int numbersSize){
     bool isSorted = true;
@@ -32,6 +25,4 @@ void bubbleSort(int *numbers, int numbersSize){
             break;
         }
     }
-    
-    drawFinalAnimation(numbers, numbersSize);
 }

@@ -13,21 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef KRUSKAL
-#define KRUSKAL
-
-#include <stdbool.h>
-#include <inttypes.h>
-
-#include "./graph.c"
-
-#include "./unionFind.c"
-#include "./vector.c"
-
-#include "../pixel.h"
-#include "./graphDraw.c"
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 int comp(const void *a, const void *b){
     const int x = (*(struct Connection**)a)->pointsSize;
@@ -86,5 +72,3 @@ void kruskalsAlgorithm(struct Vertex **points, size_t pointsSize){
     }
     free(c);
 }
-
-#endif

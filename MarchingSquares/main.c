@@ -160,7 +160,7 @@ void marchingSquares(struct Pixel *p, int **field, int columns, int rows, int re
     pixelUpdate(p);
 }
 
-int main(int argc, char **argv){
+int main(){
     int resolution = 10;
     int columns = 1 + WINDOW_WIDTH / resolution;
     int rows = 1 + WINDOW_HEIGHT / resolution;

@@ -1,9 +1,6 @@
-#include "../../pixel.h"
-#include "../func.h"
+#include "algorithms.h"
 
 #define COUNTINGSORT {"Counting Sort", &countingSort}
-
-extern struct Pixel *p;
 
 void countingSort(int *numbers, int numbersSize){
     int min = INT_MAX, max = INT_MIN;
@@ -53,6 +50,4 @@ void countingSort(int *numbers, int numbersSize){
     }
 
     free(count);
-
-    drawFinalAnimation(numbers, numbersSize);
 }

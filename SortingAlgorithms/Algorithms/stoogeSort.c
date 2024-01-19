@@ -1,11 +1,4 @@
-#include <math.h>
-
-#include "../../pixel.h"
-#include "../func.h"
-
-#define STOOGESORT {"Stooge Sort", &stoogeSort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void stoogeSortStack(int *numbers, int numbersSize){
     int i = 0;
@@ -70,5 +63,4 @@ void stoogeSortRec(int *numbers, int numbersSize, int i){
 
 void stoogeSort(int *numbers, int numbersSize){
     stoogeSortRec(numbers, numbersSize, 0);
-    drawFinalAnimation(numbers, numbersSize);
 }

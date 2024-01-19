@@ -13,28 +13,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "vector.h"
+#ifndef ALGORITHMS
+#define ALGORITHMS
 
-void vectorInit(struct Vector **v){
-    *v = malloc(sizeof(struct Vector));
-    (*v)->maxSize = 20;
-    (*v)->size = 0;
-    (*v)->val = malloc(sizeof(void*) * (*v)->maxSize);
-}
+#include <stdbool.h>
+#include <inttypes.h>
 
-void vectorPush(struct Vector *v, void *val){
-    if(v->maxSize <= v->size){
-        v->maxSize *= 2;
-        v->val = realloc(v->val, sizeof(void*) * v->maxSize);
-    }
+#include "./graph.h"
 
-    v->val[v->size++] = val;
-}
+#include "./unionFind.h"
+#include "./vector.h"
 
-void vectorFree(struct Vector *v){
-    for(size_t i = 0; i < v->size; i++){
-        free(v->val[i]);
-    }
+#include "../pixel.h"
+#include "./graphDraw.h"
 
-    free(v);
-}
+void kruskalsAlgorithm(struct Vertex **points, size_t pointsSize);
+void primsAlgorithm(struct Vertex **vertices, size_t verticesSize);
+
+#endif

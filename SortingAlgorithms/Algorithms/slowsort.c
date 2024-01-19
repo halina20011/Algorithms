@@ -1,9 +1,4 @@
-#include "../../pixel.h"
-#include "../func.h"
-
-#define SLOWSORT {"Slowsort", &slowsort}
-
-extern struct Pixel *p;
+#include "algorithms.h"
 
 void Slowsort(int *numbers, int left, int right){
     if(right <= left)
@@ -28,5 +23,4 @@ void Slowsort(int *numbers, int left, int right){
 
 void slowsort(int *numbers, int numbersSize){
     Slowsort(numbers, 0, numbersSize - 1);
-    drawFinalAnimation(numbers, numbersSize);
 }

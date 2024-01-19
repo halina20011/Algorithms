@@ -1,7 +1,4 @@
-#include "../func.h"
-
-#define QUICKSORTLOMUTO {"Quicksort (Lomuto partition scheme)", &quicksortLomuto}
-#define QUICKSORTHOARE {"Quicksort (Hoare partition scheme)", &quickSortHoare}
+#include "algorithms.h"
 
 // partition the array so the numbers less then the pivot 
 // are on the left size
@@ -35,9 +32,9 @@ void QuicksortLomuto(int *numbers, int low, int high){
         return;
     }
 
-    int p = partitionLomuto(numbers, low, high);
-    QuicksortLomuto(numbers, low, p - 1);
-    QuicksortLomuto(numbers, p, high);
+    int partition = partitionLomuto(numbers, low, high);
+    QuicksortLomuto(numbers, low, partition - 1);
+    QuicksortLomuto(numbers, partition, high);
 }
 
 int partitionHoare(int *numbers, int low, int high){
@@ -82,9 +79,9 @@ void QuickSortHoare(int *numbers, int low, int high){
         return;
     }
 
-    int p = partitionHoare(numbers, low, high);
-    QuickSortHoare(numbers, low, p);
-    QuickSortHoare(numbers, p + 1, high);
+    int partition = partitionHoare(numbers, low, high);
+    QuickSortHoare(numbers, low, partition);
+    QuickSortHoare(numbers, partition + 1, high);
 }
 
 void quicksortLomuto(int *numbers, int size){
