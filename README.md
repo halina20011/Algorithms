@@ -17,6 +17,9 @@ Heapsort </br>
 Merge Sort </br>
 Slowsort </br>
 
+## Maze generators/solvers
+<img src="/Images/terminalMaze.png" alt="preview" height="250" style="width: auto;">
+
 ## Minimum spanning tree
 <img src="/Images/minimumSpanningTree.png" alt="preview" width="300" style="height:auto;">
 

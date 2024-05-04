@@ -34,3 +34,8 @@ main: $(OBJECTS)
 
 run: main
 	./Build/main $(ARGS)
+
+debug: CFLAGS += -O0 -ggdb
+debug: main
+	@echo ${DARGS}
+	gdb -ex "set debuginfod enabled off" -ex "set args $(DARGS)" -ex run ./Build/main
