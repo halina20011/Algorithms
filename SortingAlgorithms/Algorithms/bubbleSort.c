@@ -1,28 +1,39 @@
 #include "algorithms.h"
 
-void bubbleSort(int *numbers, int numbersSize){
+void bubbleSort(){
     bool isSorted = true;
 
-    for(int i = 0; i < numbersSize - 1; i++){
+    printf("start\n");
+    // vertexUpdate(v);
+    // draw();
+    //
+    for(size_t i = 0; i < numbersSize - 1; i++){
+        printf("%zu\n", i);
         isSorted = true;
 
-        for(int j = 0; j < numbersSize - i - 1; j++){
-            drawNumbers();
-
-            pixelSetColor(p, 255, 0, 0, 255);
+        for(size_t j = 0; j < numbersSize - i - 1; j++){
             highlight(j);
             highlight(j + 1);
 
-            PixelWait();
-
-            if(numbers[j + 1] < numbers[j]){
-                swapNumbers(j, j + 1);
+            // VertexWait();
+            
+            // printf("%p %p\n", numbers[j + 1], numbers[j]);
+            // printf("%i < %i\n", numbers[j + 1]->val, numbers[j]->val);
+            if(numbers[j + 1]->val < numbers[j]->val){
+                // printf("swap\n");
+                swap(j, j + 1);
                 isSorted = false;
             }
+            
+            // printf("draw\n");
+            draw();
+            // update();
         }
 
         if(isSorted){
             break;
         }
     }
+
+    printf("end\n");
 }

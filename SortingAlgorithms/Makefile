@@ -2,16 +2,19 @@ CC = gcc
 
 CPPFLAGS = 
 CFLAGS = -Wextra -Wall -Wshadow
-LDFLAGS = $(shell sdl2-config --cflags --libs) -lm -lpng
+# LDFLAGS = $(shell sdl2-config --cflags --libs) -lm -lpng
+LDFLAGS = -lm -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lGLEW -lEGL -lGL -lGLU -lOpenGL
 
-CURR_FILES = $(wildcard *.c)
-ALGO_FILES = $(wildcard Algorithms/*.c)
-OTHER_FILES = ../pixel.c
+# CURR_FILES = $(wildcard *.c)
+CURR_FILES = main.c  singlyLinkedList.c  vertex.c func.c
+ALGO_FILES = ./Algorithms/bubbleSort.c
+# ALGO_FILES = $(wildcard Algorithms/*.c)
+# OTHER_FILES = ../pixel.c
 FILES = $(CURR_FILES) $(ALGO_FILES) $(OTHER_FILES)
 
 CURR_OBJECTS = $(patsubst %.c, Build/%.o, $(CURR_FILES))
 ALGO_OBJECTS = $(patsubst Algorithms/%.c, Build/%.o, $(ALGO_FILES))
-OTHER_OBJECTS = $(patsubst %.c, Build/%.o, $(notdir $(OTHER_FILES)))
+# OTHER_OBJECTS = $(patsubst %.c, Build/%.o, $(notdir $(OTHER_FILES)))
 OBJECTS = $(CURR_OBJECTS) $(ALGO_OBJECTS) $(OTHER_OBJECTS)
 
 .PHONY: files run
@@ -41,3 +44,11 @@ main: $(OBJECTS)
 
 run: main
 	./Build/main $(ARGS)
+
+release: CFLAGS += -O3
+release: main
+
+debug: CFLAGS += -O0 -ggdb
+debug: main
+	@echo ${DARGS}
+	gdb -ex "set debuginfod enabled off" -ex "set args $(DARGS)" -ex run ./Build/main

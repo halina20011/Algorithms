@@ -6,14 +6,12 @@
 // for time
 #include <time.h>
 
-#include "../pixel.h"
+#include "vertex.h"
 
-extern struct Pixel *p;
+extern struct Vertex *v;
 
-extern int numberWidth;
-extern int *arr;
-extern int arrSize;
-extern bool HIGHLIGHT;
+// extern struct Number *numbers;
+// extern size_t numbersSize;
 
 #ifndef WINDOW_WIDTH 
 #define WINDOW_WIDTH 800
@@ -23,15 +21,25 @@ extern bool HIGHLIGHT;
 #define WINDOW_HEIGHT 600
 #endif
 
-void fillArray(int *array, int arraySize, double increase);
-void shuffleArray(int *array, int length);
-void divisotors(int *array, int number, int *size);
-int searchInArray(int *array, int arraySize, int target);
-void printArray(int *array, int arraySize);
-void drawNumbers();
-void highlight(int index);
-void swapNumbers(int i, int j);
-void highlightRegion(int left, int right);
-void drawFinalAnimation();
+struct Changes{
+    size_t *val;
+    size_t size;
+};
+
+extern struct Changes changes;
+
+// void fillArrays(struct Numbers *numbers, int *array, int arraySize, double increase);
+// void shuffleArray(struct Numbers *numbers);
+// void divisotors(int *array, int number, int *size);
+// int searchInArray(int *array, int arraySize, int target);
+// void printArray(int *array, int arraySize);
+// void drawNumbers();
+// void highlightRegion(int left, int right);
+// void drawFinalAnimation();
+
+// void update();
+
+// void swapNumbers(int i, int j);
+// void highlight(int index);
 
 #endif
